@@ -218,7 +218,7 @@ This modular design is important because the OCR result is influenced by more
 than the recognizer itself. Rotation handling, unwarping, text detection, and
 line orientation correction can all change final accuracy.
 
-For our experiment, we used PP-OCRv5.
+For our experiment, we used [PP-v5OCR](https://huggingface.co/collections/PaddlePaddle/pp-ocrv5).
 
 #### What PP-OCR is good at
 
@@ -480,7 +480,7 @@ Paddle emphasizes:
 - model inference
 - pipeline composition
 - structured outputs
-- developer-controlled post-and- pre-processing
+- developer-controlled post-and-pre-processing
 
 So ABBYY is more likely to ship with business-process guardrails already in
 mind, while Paddle is more likely to require custom downstream logic if you
@@ -945,6 +945,12 @@ Ranked by normalized word error rate:
 6. `olmOCR`
    Word accuracy `90.60%`, WER `9.40%`, CER `4.19%`
 
+The human first-article reference contains `936` words. Comparing raw output
+lengths is not the same as comparing transcription quality, but it is still a
+useful quick check for under- or over-production against that target.
+
+![First-article word counts](test-results/plots/png/human_word_counts.png)
+
 This means ABBYY remained the best overall article transcription in the current
 tests, but the strongest Paddle-centered results were close enough to be worth
 careful comparison rather than dismissal.
@@ -1217,6 +1223,9 @@ reads the two Excel workbooks and builds a Plotly HTML dashboard:
 - [test-results/plots/ocr_evaluation_dashboard.html](test-results/plots/ocr_evaluation_dashboard.html)
 - PNG exports under [test-results/plots/png](test-results/plots/png)
 
+The HTML dashboard renders the full chart set in English first and then again
+in French.
+
 Generate or refresh it with:
 
 ```bash
@@ -1228,11 +1237,14 @@ The dashboard includes several useful views of the data:
 - whole-page line recovery
   shows how closely each workflow matched ABBYY's line-level coverage
 - whole-page word recovery
-  shows why preprocess-only failed and why `3x2 grid + PP-DocLayoutV3` became the base
+  shows why preprocess-only failed and why `PaddleOCR (No VL)` became the base
   pipeline
 - whole-page word counts
   shows the absolute word totals returned by ABBYY and each Paddle-based
   workflow
+- first-article word counts
+  shows the human-reference word count plus ABBYY and each Paddle-based
+  transcription, sorted from low to high
 - whole-page artifact totals
   compares cleanup quality across the post-OCR VL backends against the ABBYY
   baseline
