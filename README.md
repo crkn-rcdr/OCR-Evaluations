@@ -656,6 +656,24 @@ That repo's defaults and presets include steps such as:
 - `sauvola_binary`
 - black-border cropping before OCR
 
+In plain terms, those options mean:
+
+- `light_clean` applies a very light denoising pass to remove small scanner
+  grime and speckle without heavily changing the page
+- `background_flatten` estimates the page's uneven gray background and evens it
+  out so the text stands out more consistently across the sheet
+- `contrast` / CLAHE boosts local contrast in small regions, which can make
+  faint strokes and thin newspaper type easier for OCR to separate from the
+  page
+- `deskew` tries to detect whether the whole page is slightly rotated and, if
+  so, rotates it back to a more level reading angle
+- `sauvola_binary` converts the page into a black-and-white style text image
+  using adaptive thresholding, which can help when foreground and background
+  are hard to separate but can also throw away useful grayscale detail
+- black-border cropping before OCR tries to detect the real page area inside a
+  dark scanner border, crop to that region, and then keep track of the offset
+  so OCR coordinates can still be mapped back to the original image
+
 For this page, preprocessing matters because the text sits inside a large dark
 border and on an uneven gray background. Even when OCR can still "see" the
 letters, cleanup can materially improve text detection, reduce false positives
@@ -996,27 +1014,12 @@ comparison. It is usually a platform-vs-pipeline-stack comparison. If you want P
 
 So a fair ABBYY-vs-Paddle benchmark should record whether Paddle was given these extra supporting steps, because ABBYY's observed quality often depends on them.
 
-
-### Practical takeaway for this repo
-
-When comparing ABBYY against PaddleOCR, PaddleVL, olmOCR, Chandra, or DeepSeek
-VL, it helps to remember that ABBYY is effectively a pipeline rather than a
-single recognizer. Its results may reflect:
-
-- preprocessing and image cleanup
-- page segmentation and layout understanding
-- language and script support
-- table and field detection
-- OCR plus ICR plus barcode/mark recognition
-- rule-based and database-backed validation
-- optional human correction loops
-
 So if ABBYY outperforms a model on a document, the difference may come from any
 combination of recognition quality, layout analysis, field constraints,
 validation logic, or workflow-level post-processing, not just from better raw
 character classification.
 
-### What ABBYY does around the document that Paddle would need to recreate
+### What ABBYY does around the document that Paddle users would need to recreate
 
 If the goal is to get Paddle closer to ABBYY-quality end-to-end OCR on difficult
 documents, it is not enough to compare ABBYY against a bare OCR recognizer.
