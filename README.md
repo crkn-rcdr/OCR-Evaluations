@@ -962,7 +962,7 @@ Three details stand out:
 The results suggest a set of conclusions:
 
 - preprocessing helped, but was nowhere near sufficient by itself
-- `PaddleOCR (No VL)` was the decisive recall improvement
+- tiling the source image into a `3x2 grid + PP-DocLayoutV3` tiles was the decisive recall improvement
 - post-OCR VL correction mattered mainly as a cleanup stage on top of that
   stronger base pipeline
 - `PaddleVL` gave the best whole-page cleanup by artifact counts
