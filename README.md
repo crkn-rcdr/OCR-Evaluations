@@ -160,7 +160,7 @@ Sources:
 - https://help.abbyy.com/assets/en-us/finereader/16/Users_Guide.pdf
 - https://support.abbyy.com/hc/en-us/articles/360020669679-Specifications-for-FineReader-PDF-for-Mac
 
-# How Paddle Works
+## How Paddle Works
 
 The notes below summarize Paddle's official documentation reviewed on
 May 26, 2026, focusing on the parts most relevant to this repo:
@@ -178,7 +178,7 @@ At a high level, Paddle is not one single OCR model. It is a stack:
 - `PaddleOCR-VL` is the newer vision-language document parsing pipeline exposed
   through `doc_parser`
 
-## 1. PaddleX as the orchestration layer
+### 1. PaddleX as the orchestration layer
 
 According to Paddle's official docs, PaddleOCR reuses PaddleX for inference
 deployment, pre-processing, post-processing, model composition, and service
@@ -194,7 +194,7 @@ That means PaddleX is doing several important jobs under the hood:
 - supporting service-oriented deployment and high-performance inference
 - keeping pipeline naming and configuration consistent across CLI and Python
 
-## 2. PaddleOCR / PP-OCR: the general OCR pipeline
+### 2. PaddleOCR / PP-OCR: the general OCR pipeline
 
 PaddleOCR's general OCR pipeline is the modular text-reading path. The official pipeline docs describe five stages:
 
@@ -220,7 +220,7 @@ line orientation correction can all change final accuracy.
 
 For our experiment, we used PP-OCRv5.
 
-### What PP-OCR is good at
+#### What PP-OCR is good at
 
 PP-OCR is the right Paddle family component when the main task is:
 
@@ -234,7 +234,7 @@ model. That usually makes it lighter and easier to reason about, but it also
 means document structure has to be handled by additional pipelines when the
 page is complex.
 
-## 3. PP-Structure: document layout parsing and structure recovery
+### 3. PP-Structure: document layout parsing and structure recovery
 
 PP-Structure is Paddle's structured document analysis pipeline. The current
 PP-StructureV3 docs describe it as a layout analysis pipeline that combines OCR,
@@ -267,7 +267,7 @@ well:
 For repo comparisons, PP-Structure is the Paddle component most analogous to
 the structure-preserving part of ABBYY's document workflow.
 
-## 4. Paddle PP-DocLayoutV3r: the PaddleOCR-VL document parsing pipeline
+### 4. Paddle DocParser / PP-DocLayoutV3: the PaddleOCR-VL document parsing pipeline
 
 In current PaddleOCR 3.x docs, `doc_parser` is the CLI/API-facing document
 parsing pipeline tied to `PaddleOCR-VL`. It is not just another name for
@@ -298,7 +298,7 @@ So "Paddle PP-DocLayoutV3r" is best understood as Paddle's structured document
 parsing entry point, powered by the PaddleOCR-VL family and surrounding layout
 logic.
 
-## 5. PaddleOCR-VL: VLM-based parsing instead of only OCR
+### 5. PaddleOCR-VL: VLM-based parsing instead of only OCR
 
 ([PaddleOCR-VL-1.5-0.9B](https://huggingface.co/PaddlePaddle/PaddleOCR-VL-1.5)) 
 
@@ -343,14 +343,14 @@ Sources:
 - https://www.paddleocr.ai/main/en/version3.x/paddleocr_and_paddlex.html
 - https://www.paddleocr.ai/main/en/version3.x/paddlex/overview.html
 
-# ABBYY vs Paddle
+## ABBYY vs Paddle
 
 This section compares ABBYY against Paddle as they are most relevant to this
 repo. "Paddle" here does not mean one thing: it can mean `PP-OCR`,
 `PP-Structure`, or `doc_parser` / `PaddleOCR-VL`, all orchestrated through
 `PaddleX`.
 
-## High-level difference
+### High-level difference
 
 At a high level, ABBYY is a commercial document processing platform with OCR or
 ICR embedded inside a broader validation and workflow system. Paddle is an
@@ -363,7 +363,7 @@ That leads to a practical distinction:
 - ABBYY is usually opinionated and workflow-oriented
 - Paddle is usually modular and engineering-oriented
 
-## Where ABBYY is stronger
+### Where ABBYY is stronger
 
 ABBYY tends to be stronger when the document problem is not only "read the
 text" but "extract reliable business data from messy documents with controls."
@@ -380,7 +380,7 @@ Its advantages include:
 In other words, ABBYY often wins by combining recognition with structure,
 constraints, and workflow-level quality control.
 
-## Where Paddle is stronger
+### Where Paddle is stronger
 
 Paddle tends to be stronger when you want openness, flexibility, and control
 over how the OCR stack is assembled.
@@ -397,7 +397,7 @@ Its advantages include:
 In this repo specifically, Paddle is useful because it exposes more of the
 pipeline knobs that can be tuned, swapped, or inspected during benchmarking.
 
-## OCR philosophy: integrated platform vs modular stack
+### OCR philosophy: integrated platform vs modular stack
 
 ABBYY and Paddle are solving related problems, but they package the solution
 very differently.
@@ -422,7 +422,7 @@ Paddle behaves more like a toolkit with multiple tiers:
 That means ABBYY usually presents a more unified workflow, while Paddle gives
 you more freedom to choose which pipeline style to run.
 
-## Structured documents
+### Structured documents
 
 Both ABBYY and Paddle care about document structure, but they get there
 differently.
@@ -441,7 +441,7 @@ So if Paddle underperforms ABBYY on a complex page, the reason may simply be
 that the comparison used `PP-OCR` when the more appropriate Paddle baseline was
 `PP-Structure` or `PaddleOCR-VL`.
 
-## Handwriting and ICR
+### Handwriting and ICR
 
 ABBYY can support ICR for structured hand-printed text fields. That is
 important for forms, boxed entries, and constrained handwriting zones.
@@ -463,7 +463,7 @@ hand-printed field extraction, ABBYY may still have an advantage in product
 design and workflow assumptions, even though Paddle is not limited to
 printed-text-only OCR.
 
-## Validation and trust model
+### Validation and trust model
 
 One of the biggest differences is what happens after text is recognized.
 
@@ -486,7 +486,7 @@ So ABBYY is more likely to ship with business-process guardrails already in
 mind, while Paddle is more likely to require custom downstream logic if you
 need the same level of validation discipline.
 
-## Failure modes
+### Failure modes
 
 The two stacks can fail for different reasons.
 
@@ -507,7 +507,7 @@ Paddle failure modes vary by pipeline:
 So a fair comparison should identify not just whether output is wrong, but what
 kind of system design issue caused the discrepancy.
 
-## Cost and control
+### Cost and control
 
 ABBYY usually offers more packaged functionality out of the box, but that comes
 with commercial product constraints and high licensing costs.
@@ -522,7 +522,7 @@ Paddle usually offers:
 But that flexibility also means the user has to make more decisions about
 pipeline selection, preprocessing, evaluation methodology, and post-processing. One might also need development skills.
 
-# PaddleVL vs olmOCR, DeepSeek, and Chandra
+## PaddleVL vs olmOCR, DeepSeek, and Chandra
 
 During the expirement, we also used the following alternative VL libraries:
 
@@ -531,7 +531,7 @@ During the expirement, we also used the following alternative VL libraries:
 - `DeepSeek OCR` ([deepseek-ocr:3b](https://ollama.com/library/deepseek-ocr:3b)) is an end-to-end OCR and document-to-markdown model built
   around visual-text compression
 
-## PaddleVL vs olmOCR
+### PaddleVL vs olmOCR
 
 `PaddleVL` and `olmOCR` both go beyond raw text extraction, but they are aimed
 at different outcomes.
@@ -551,7 +551,7 @@ If the target is structured page understanding across many languages,
 `PaddleVL` has the clearer specialization. If the target is high-throughput
 PDF linearization into clean text, `olmOCR` has the clearer specialization.
 
-## PaddleVL vs DeepSeek OCR
+### PaddleVL vs DeepSeek OCR
 
 `PaddleVL` and `DeepSeek OCR` are both VLM-style document systems, but their
 technical framing is different.
@@ -572,7 +572,7 @@ better fit when tighter layout-oriented pipeline control and multilingual
 document parsing are more important.
 
 
-## PaddleVL vs Chandra
+### PaddleVL vs Chandra
 
 `PaddleVL` and `Chandra` are more directly comparable because both are aimed at
 structured document output rather than only flat OCR text.
@@ -600,12 +600,12 @@ Sources:
 - https://huggingface.co/deepseek-ai/DeepSeek-OCR
 
 
-# Testing 
+## Testing 
 
-## Source image
+### Source image
 ![alt text](testdata/source/large/oocihm.N_00155_18750610.4.jpg)
 
-### OCR Challenges
+#### OCR Challenges
 
 This test image is a difficult historical newspaper page rather than a clean
 modern scan. The page combines several OCR failure modes at once:
@@ -623,7 +623,7 @@ small words, merges adjacent columns, or misreads punctuation. It is also the
 kind of page where ABBYY benefits from its surrounding document-analysis stack,
 so Paddle needed extra supporting steps to get closer.
 
-## Methodologies
+### Methodologies
 
 Comparing Paddle OCR with ABBYY on this page required more than switching OCR
 models. The testing in this repo is built around a Paddle OCR expirement pipeline which includes stages to: improve the page before OCR, reduce page scale
@@ -644,7 +644,7 @@ The goal was not only to increase raw character accuracy, but also to reduce:
 - punctuation artifacts
 - OCR mistakes that are locally ambiguous but visually recoverable from crops
 
-### Pre-processing
+#### Pre-processing
 
 Historical pages often benefit from mild cleanup before local OCR.
 That repo's defaults and presets include steps such as:
@@ -688,7 +688,7 @@ page were:
 Other preprocessing options were tested, but on this image they produced worse
 results overall than this lighter combination.
 
-### Tiling
+#### Tiling
 
 Large broadsheet pages are one of the main reasons tiling was necessary.
 We experimented with several tile strategies for PP-OCR-style workflows:
@@ -735,7 +735,7 @@ returned the largest amount of text or word content on this page. The simpler
 tiling options were still useful as comparison points, but this combination
 recovered more of the newspaper content overall.
 
-### Suspicious Word level VL Correction
+#### Suspicious Word level VL Correction
 
 The PaddleOCR expirement pipeline also adds a second-pass correction stage for `PP-OCRv5`.
 Instead of rerunning the whole page through a larger model, it can:
@@ -784,7 +784,7 @@ targeted than the broader `low_confidence` mode. In practice, it is trying to
 find words that look specifically like OCR errors, not just words that happen
 to come from a weaker line.
 
-### Punctuation Cleaning
+#### Punctuation Cleaning
 
 The PaddleOCR expirement pipeline also included a punctuation-cleaning stage. This exists
 because historical newspaper OCR often produces artifacts that are not full
@@ -799,7 +799,7 @@ That matters in this repo because the downstream comparisons are text-based.
 Even when a word is essentially correct, punctuation noise can inflate apparent
 error counts or make human review harder.
 
-## Comparisons
+### Comparisons
 
 The main comparison artifacts are:
 
@@ -834,16 +834,9 @@ than only a model-leaderboard question:
 - which extra steps matter most: preprocessing, stronger segmentation, or
   second-pass VL correction
 
-## Results
+### Results
 
-The two comparison workbooks point to a consistent overall story:
-
-- preprocessing alone was not enough
-- `3x2 grid + PP-DocLayoutV3` was the step that recovered the page
-- post-OCR VL correction then determined how much of that recovered text could
-  be cleaned up
-
-### Whole-page recovery vs ABBYY
+#### Whole-page recovery vs ABBYY
 
 The workbook
 [test-results/paddle_vs_abbyy_errors_artifacts.xlsx](test-results/paddle_vs_abbyy_errors_artifacts.xlsx)
@@ -867,13 +860,13 @@ The `3x2 grid + PP-DocLayoutV3 only` run changed that completely:
 - Paddle word count: `16685`
 - ABBYY word count: `15999`
 
-That is why `3x2 grid + PP-DocLayoutV3` was kept for all runs. It brought the page back to roughly the same scale of recoverable content as ABBYY. For the remainder of the dicussion it will be labeled as the `PaddleOCR (No VL)` run. In other words, the pipeline moved
-from "not seeing enough text" to "seeing almost everything, including some bad
-or duplicated text."
+That is why `3x2 grid + PP-DocLayoutV3` was kept for all runs. It brought the page back to roughly the same scale of recoverable content as ABBYY. For the remainder of the dicussion it will be labeled as the `PaddleOCR (No VL)` run. 
 
 ![Whole-page line recovery](test-results/plots/png/line_count_recovery.png)
 
 ![Whole-page word recovery](test-results/plots/png/word_count_recovery.png)
+
+![Whole-page word counts](test-results/plots/png/whole_page_word_counts.png)
 
 That shift also changed the error profile. After tiling, the dominant Paddle
 problems were no longer missing huge parts of the page, but rather:
@@ -887,7 +880,7 @@ problems were no longer missing huge parts of the page, but rather:
 So the tradeoff was clear: tiling dramatically improved recall, but it also
 increased cleanup work.
 
-### Post-OCR VL backend comparison
+#### Post-OCR VL backend comparison
 
 On the same whole-page workbook, the post-OCR VL backends differed mainly in
 how much artifact cleanup they achieved after the strong base pipeline.
@@ -914,7 +907,7 @@ spacing problems. The difference is that ABBYY generally avoided the very large
 coverage loss seen in the preprocess-only Paddle run, while also avoiding as
 many duplicate or tiled-overlap artifacts as the raw tiled Paddle output.
 
-### Human-transcription comparison
+#### Human-transcription comparison
 
 The workbook
 [test-results/first_article_ocr_comparison.xlsx](test-results/first_article_ocr_comparison.xlsx)
@@ -981,7 +974,7 @@ Two details stand out:
   WER, which suggests many remaining Paddle errors are word-level substitutions,
   joins, or segmentation mistakes rather than uniformly bad character reading
 
-### Conclusions
+#### Conclusions
 
 The results suggest a set of conclusions:
 
@@ -1019,14 +1012,14 @@ combination of recognition quality, layout analysis, field constraints,
 validation logic, or workflow-level post-processing, not just from better raw
 character classification.
 
-### What ABBYY does around the document that Paddle users would need to recreate
+#### What ABBYY does around the document that Paddle users would need to recreate
 
 If the goal is to get Paddle closer to ABBYY-quality end-to-end OCR on difficult
 documents, it is not enough to compare ABBYY against a bare OCR recognizer.
 ABBYY's own document-processing pages describe several surrounding stages that
 materially affect recognition quality and output quality.
 
-#### Image enhancement before OCR
+##### Image enhancement before OCR
 
 ABBYY explicitly says it improves document images before recognition. On its
 current Document AI pages, this includes correcting distortions from mobile
@@ -1051,7 +1044,7 @@ This is one of the biggest reasons a commercial platform can outperform a raw
 open OCR run on messy documents: the recognizer may be seeing a much better
 image.
 
-#### Full document analysis, not just text detection
+##### Full document analysis, not just text detection
 
 ABBYY says it analyzes both the page layout and the logical structure of the
 document. Its OCR SDK documentation specifically mentions text blocks, tables,
@@ -1072,7 +1065,7 @@ Without that layer, Paddle may read the right characters locally but still
 produce weaker page-level output because the page structure was handled less
 well.
 
-#### Document classification and routing
+##### Document classification and routing
 
 ABBYY's current OCR/ICR and data extraction pages describe classification as a
 separate step: the system analyzes both image and text features, determines the
@@ -1089,7 +1082,7 @@ decide questions like:
 Without routing, Paddle is often evaluated as one fixed pipeline against ABBYY's
 adaptive workflow, which is not an equal comparison.
 
-#### Field-aware extraction instead of plain text dumping
+##### Field-aware extraction instead of plain text dumping
 
 ABBYY's public materials emphasize that OCR and ICR feed extraction. It is not
 only recognizing text; it is recognizing text in the context of expected
@@ -1107,7 +1100,7 @@ This matters because raw OCR text can look worse than ABBYY even when the
 characters are similar, simply because ABBYY is reconstructing structured
 results rather than emitting a flat stream.
 
-#### Validation and constraint checking after recognition
+##### Validation and constraint checking after recognition
 
 ABBYY explicitly describes a validation stage where extracted data is checked
 against predefined rules and external databases, with human review for more
@@ -1125,7 +1118,7 @@ such as:
 This does not improve the raw OCR model directly, but it improves practical
 output quality by catching bad reads before they become final data.
 
-#### Human review for uncertain cases
+##### Human review for uncertain cases
 
 ABBYY's pipeline includes human-in-the-loop review and continuous learning from
 corrections. That matters because a production-quality result is not only about
@@ -1142,7 +1135,7 @@ To match that with Paddle, you would likely need:
 If ABBYY produces fewer bad final outputs, part of the reason may be that it is
 designed to stop and ask for help when confidence is low.
 
-#### Export and reconstruction logic
+##### Export and reconstruction logic
 
 ABBYY's OCR SDK pages emphasize exact or high-quality reconstruction of the
 document's structure and formatting. That means the final output is shaped by
@@ -1169,9 +1162,9 @@ layout preservation and cleanup.
 FineReader remains a strong real-world benchmark for OCR systems
 that need both recognition quality and document-structure preservation.
 
-# Analysis And Helper Scripts
+## Analysis And Helper Scripts
 
-## Comparison Tool
+### Comparison Tool
 
 The repo includes [tools/compare_ocr_errors.py](tools/compare_ocr_errors.py) for
 Paddle-vs-ABBYY review.
@@ -1200,7 +1193,7 @@ Current Excel behavior:
 - if the target workbook already exists, the script reuses the existing sheet names, freeze panes, column widths, and row heights
 
 
-## Human Comparison Workbook
+### Human Comparison Workbook
 
 [tools/compare_ocr_to_human.py](tools/compare_ocr_to_human.py) compares a human transcription against ABBYY plus every `first-article.txt` found under `test-results/paddlecomp`, then writes a shareable Excel workbook.
 
@@ -1215,7 +1208,7 @@ python tools/compare_ocr_to_human.py \
   --prefix first_article_ocr_comparison
 ```
 
-## Plotly visualizations
+### Plotly visualizations
 
 The comparison workbooks are easier to interpret when graphed. The repo 
 includes [tools/generate_ocr_plots.py](tools/generate_ocr_plots.py), which
@@ -1237,6 +1230,9 @@ The dashboard includes several useful views of the data:
 - whole-page word recovery
   shows why preprocess-only failed and why `3x2 grid + PP-DocLayoutV3` became the base
   pipeline
+- whole-page word counts
+  shows the absolute word totals returned by ABBYY and each Paddle-based
+  workflow
 - whole-page artifact totals
   compares cleanup quality across the post-OCR VL backends against the ABBYY
   baseline

@@ -138,6 +138,15 @@ def main() -> None:
             build_word_recovery_figure(whole_page),
         ),
         (
+            "whole_page_word_counts",
+            "Whole-Page Word Counts",
+            (
+                "Absolute whole-page word counts for ABBYY and each Paddle-based "
+                "workflow."
+            ),
+            build_absolute_word_count_figure(whole_page),
+        ),
+        (
             "artifact_totals",
             "Whole-Page Artifact Totals",
             (
@@ -354,6 +363,40 @@ def build_word_recovery_figure(rows: list[SheetSummary]) -> go.Figure:
         showlegend=False,
     )
     figure.update_yaxes(range=[0, max(word_pct) * 1.18])
+    return figure
+
+
+def build_absolute_word_count_figure(rows: list[SheetSummary]) -> go.Figure:
+    labels = ["ABBYY", *[row.label for row in rows]]
+    values = [rows[0].abbyy_word_count, *[row.paddle_word_count for row in rows]]
+    colors = [
+        "#6C757D",
+        "#33658A",
+        "#55A630",
+        "#BC4749",
+        "#FF9F1C",
+        "#6A4C93",
+        "#1982C4",
+    ][: len(labels)]
+
+    figure = go.Figure()
+    figure.add_trace(
+        go.Bar(
+            x=labels,
+            y=values,
+            text=[f"{value:,}" for value in values],
+            textposition="outside",
+            marker_color=colors,
+            hovertemplate="%{x}<br>Word count: %{y:,}<extra></extra>",
+            showlegend=False,
+        )
+    )
+    figure.update_layout(
+        yaxis_title="Whole-page word count",
+        template="plotly_white",
+        margin=dict(l=60, r=30, t=50, b=100),
+    )
+    figure.update_yaxes(range=[0, max(values) * 1.15])
     return figure
 
 
