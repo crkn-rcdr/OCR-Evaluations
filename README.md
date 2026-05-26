@@ -690,16 +690,7 @@ results overall than this lighter combination.
 
 #### Tiling
 
-Large broadsheet pages are one of the main reasons tiling was necessary.
-We experimented with several tile strategies for PP-OCR-style workflows:
-
-- `grid_3x1`
-- `grid_3x2`
-- `doclayout_v3`
-- `grid_doclayout_v3`
-- `grid_3x2_doclayout_v3`
-
-The rationale is straightforward: when the full page is too large and the text
+Large broadsheet pages are one of the main reasons tiling was necessary. The rationale is straightforward: when the full page is too large and the text
 too small, splitting the page into smaller regions gives the recognizer more
 effective resolution per text line.
 
@@ -715,20 +706,6 @@ For this repo, the important tile variants are:
 - `3x2 grid + PP-DocLayoutV3`
   - fixed tiling first, then layout-guided sub-segmentation inside each large
     tile using DocLayout-style parsing
-
-The important distinction is that DocLayout parsing can be used in two ways:
-
-- on the full page, where `PP-DocLayoutV3` detects headers, paragraphs, and
-  other text regions directly from the original image and turns them into OCR
-  subtiles
-- inside a fixed grid tile, where the page is first split into larger bands and
-  then each band is subdivided again by layout detection
-
-That second approach is what this repo refers to as `3x2 grid + PP-DocLayoutV3`. It
-is the most aggressive segmentation strategy in the current tests and is
-closest to saying: do not trust a single whole-page OCR pass on a page like
-this; first reduce the page scale, then let the layout parser carve each large
-tile into smaller document-element regions.
 
 After testing, `3x2 grid + PP-DocLayoutV3` was the tiling strategy we kept because it
 returned the largest amount of text or word content on this page. The simpler
@@ -968,7 +945,7 @@ has afforded`, `monarchical system` becoming `chemicals system`, and
 position on the chart reflects both higher error volume and more disruptive
 error types than the other Paddle-centered runs.
 
-Two details stand out:
+Three details stand out:
 
 - `Chandra` is slightly ahead of `PaddleVL` on both word accuracy and WER,
   and it also has the better CER, so it produced the stronger article-level
