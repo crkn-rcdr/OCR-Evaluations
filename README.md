@@ -148,204 +148,6 @@ formats such as JSON, CSV, and XML, or sends it into downstream systems through
 APIs and connectors. That makes the end product more than OCR text alone: the
 real deliverable is structured data aligned to business workflows.
 
-### Practical takeaway for this repo
-
-When comparing ABBYY against PaddleOCR, PaddleVL, olmOCR, Chandra, or DeepSeek
-VL, it helps to remember that ABBYY is effectively a pipeline rather than a
-single recognizer. Its results may reflect:
-
-- preprocessing and image cleanup
-- page segmentation and layout understanding
-- language and script support
-- table and field detection
-- OCR plus ICR plus barcode/mark recognition
-- rule-based and database-backed validation
-- optional human correction loops
-
-So if ABBYY outperforms a model on a document, the difference may come from any
-combination of recognition quality, layout analysis, field constraints,
-validation logic, or workflow-level post-processing, not just from better raw
-character classification.
-
-### What ABBYY does around the document that Paddle would need to recreate
-
-If the goal is to get Paddle closer to ABBYY-quality end-to-end OCR on difficult
-documents, it is not enough to compare ABBYY against a bare OCR recognizer.
-ABBYY's own document-processing pages describe several surrounding stages that
-materially affect recognition quality and output quality.
-
-#### 1. Image enhancement before OCR
-
-ABBYY explicitly says it improves document images before recognition. On its
-current Document AI pages, this includes correcting distortions from mobile
-cameras, handling poor lighting, and separating text from noisy or patterned
-backgrounds, field markings, guides, lines, and protection marks. Its OCR SDK
-pages also describe traditional preprocessing functions such as rotation,
-binarization, and de-skewing.
-
-To make Paddle more comparable, you would want to recreate a preprocessing
-layer that can do at least some of the following:
-
-- page rotation and orientation correction
-- de-skewing or geometric correction
-- perspective correction / unwarping
-- contrast normalization
-- denoising and background suppression
-- border removal and crop cleanup
-- binarization or adaptive thresholding where useful
-- line / guide / form-mark suppression when those elements hurt OCR
-
-This is one of the biggest reasons a commercial platform can outperform a raw
-open OCR run on messy documents: the recognizer may be seeing a much better
-image.
-
-#### 2. Full document analysis, not just text detection
-
-ABBYY says it analyzes both the page layout and the logical structure of the
-document. Its OCR SDK documentation specifically mentions text blocks, tables,
-table cells, pictures, barcodes, separators, page orientation, double pages,
-vertical text, and non-relevant areas that should be ignored.
-
-To approximate that in Paddle, you would need more than text detection. You
-would also need:
-
-- layout region detection
-- non-text region suppression
-- table detection and reconstruction
-- reading-order recovery
-- header / footer / marginalia handling
-- region-specific OCR decisions
-
-Without that layer, Paddle may read the right characters locally but still
-produce weaker page-level output because the page structure was handled less
-well.
-
-#### 3. Document classification and routing
-
-ABBYY's current OCR/ICR and data extraction pages describe classification as a
-separate step: the system analyzes both image and text features, determines the
-document type, and routes the document to the appropriate extraction model.
-
-To recreate that behavior with Paddle, you would need a routing layer that can
-decide questions like:
-
-- is this page better handled by `PP-OCR`, `PP-Structure`, or `PaddleOCR-VL`
-- is this document a form, article page, ID, invoice, or something else
-- should table parsing or layout-heavy parsing be enabled
-- should different preprocessing or decoding settings be applied to this class
-
-Without routing, Paddle is often evaluated as one fixed pipeline against ABBYY's
-adaptive workflow, which is not an equal comparison.
-
-#### 4. Field-aware extraction instead of plain text dumping
-
-ABBYY's public materials emphasize that OCR and ICR feed extraction. It is not
-only recognizing text; it is recognizing text in the context of expected
-document fields, tables, checkmarks, barcodes, signatures, and related business
-elements.
-
-To get closer with Paddle, you would need application-level logic that can:
-
-- identify which regions correspond to target fields
-- choose the right parser for those regions
-- preserve table and form structure
-- normalize output into field/value representations instead of only free text
-
-This matters because raw OCR text can look worse than ABBYY even when the
-characters are similar, simply because ABBYY is reconstructing structured
-results rather than emitting a flat stream.
-
-#### 5. Validation and constraint checking after recognition
-
-ABBYY explicitly describes a validation stage where extracted data is checked
-against predefined rules and external databases, with human review for more
-complex cases.
-
-To recreate that quality layer around Paddle, you would need post-processing
-such as:
-
-- regex and format validation
-- allowed-character or dictionary checks
-- cross-field consistency rules
-- database or lookup-table verification
-- confidence thresholds that trigger review instead of silent acceptance
-
-This does not improve the raw OCR model directly, but it improves practical
-output quality by catching bad reads before they become final data.
-
-#### 6. Human review for uncertain cases
-
-ABBYY's pipeline includes human-in-the-loop review and continuous learning from
-corrections. That matters because a production-quality result is not only about
-high average accuracy. It is also about safely handling the pages the model is
-not confident about.
-
-To match that with Paddle, you would likely need:
-
-- confidence scoring or heuristics for escalation
-- a review UI or annotation loop
-- corrected-output capture
-- a feedback path for improving prompts, preprocessing, routing, or training
-
-If ABBYY produces fewer bad final outputs, part of the reason may be that it is
-designed to stop and ask for help when confidence is low.
-
-#### 7. Export and reconstruction logic
-
-ABBYY's OCR SDK pages emphasize exact or high-quality reconstruction of the
-document's structure and formatting. That means the final output is shaped by
-layout recovery and export logic, not only by text recognition.
-
-To reproduce that with Paddle, you may need additional code for:
-
-- reading-order reconstruction
-- block merging and region cleanup
-- Markdown / JSON / ALTO shaping
-- table serialization
-- page-level normalization before TXT export
-
-This is especially important in this repo because evaluation quality can be
-affected by formatting artifacts, not just by recognition mistakes.
-
-### ABBYY FineReader PDF as the desktop OCR benchmark
-
-The ABBYY discussion above is mostly about ABBYY's broader OCR SDK and
-Document AI positioning. A related but distinct product is `ABBYY FineReader
-PDF`, which is the desktop OCR application many users still treat as a practical
-benchmark for document OCR quality.
-
-The IntuitionLabs article
-["Technical Analysis of Modern Non-LLM OCR Engines"](https://intuitionlabs.ai/articles/non-llm-ocr-technologies)
-describes FineReader as a long-established commercial OCR leader with strong
-layout analysis, robust PDF conversion, and continued AI-driven improvements.
-That framing matches the way ABBYY often behaves in practice in evaluations: it
-is not only a recognizer, but a mature end-user document workflow with strong
-layout preservation and cleanup.
-
-Some version-sensitive details need to be stated carefully:
-
-- the IntuitionLabs article says `FineReader PDF 16` is the current Windows
-  desktop generation as of February 2026 and describes features such as updated
-  paragraph editing, table-cell editing, and an `Organize Pages` workflow
-- the same article says the Windows product recognizes text in `192` languages
-  with spell check for `48`
-- ABBYY's current official `FineReader PDF for Mac` support page separately
-  lists `198` recognition languages and `53` languages with dictionary support
-
-So the safe summary is that FineReader's language counts and feature packaging
-can differ by platform, and the Windows and Mac products should not be treated
-as identical based on one secondary source alone.
-
-The IntuitionLabs article also describes FineReader as using neural OCR
-components, possibly in a multi-engine setup that combines newer LSTM-based
-recognition with older ABBYY logic. That is a useful external interpretation,
-but it should be read as informed analysis rather than fully confirmed ABBYY
-technical disclosure. ABBYY's public product materials are much clearer about
-capabilities than about exact internal model architecture.
-
-FineReader remains a strong real-world benchmark for OCR systems
-that need both recognition quality and document-structure preservation.
-
 Sources:
 
 - https://www.abbyy.com/ai-document-processing/ocr-icr/
@@ -1198,7 +1000,7 @@ Two details stand out:
 
 ### Conclusions
 
-The results suggest a stepwise conclusion:
+The results suggest a set of conclusions:
 
 - preprocessing helped, but was nowhere near sufficient by itself
 - `PaddleOCR (No VL)` was the decisive recall improvement
@@ -1228,6 +1030,176 @@ comparison. It is usually a platform-vs-pipeline-stack comparison. If you want P
 - cleaner export normalization
 
 So a fair ABBYY-vs-Paddle benchmark should record whether Paddle was given these extra supporting steps, because ABBYY's observed quality often depends on them.
+
+
+### Practical takeaway for this repo
+
+When comparing ABBYY against PaddleOCR, PaddleVL, olmOCR, Chandra, or DeepSeek
+VL, it helps to remember that ABBYY is effectively a pipeline rather than a
+single recognizer. Its results may reflect:
+
+- preprocessing and image cleanup
+- page segmentation and layout understanding
+- language and script support
+- table and field detection
+- OCR plus ICR plus barcode/mark recognition
+- rule-based and database-backed validation
+- optional human correction loops
+
+So if ABBYY outperforms a model on a document, the difference may come from any
+combination of recognition quality, layout analysis, field constraints,
+validation logic, or workflow-level post-processing, not just from better raw
+character classification.
+
+### What ABBYY does around the document that Paddle would need to recreate
+
+If the goal is to get Paddle closer to ABBYY-quality end-to-end OCR on difficult
+documents, it is not enough to compare ABBYY against a bare OCR recognizer.
+ABBYY's own document-processing pages describe several surrounding stages that
+materially affect recognition quality and output quality.
+
+#### Image enhancement before OCR
+
+ABBYY explicitly says it improves document images before recognition. On its
+current Document AI pages, this includes correcting distortions from mobile
+cameras, handling poor lighting, and separating text from noisy or patterned
+backgrounds, field markings, guides, lines, and protection marks. Its OCR SDK
+pages also describe traditional preprocessing functions such as rotation,
+binarization, and de-skewing.
+
+To make Paddle more comparable, you would want to recreate a preprocessing
+layer that can do at least some of the following:
+
+- page rotation and orientation correction
+- de-skewing or geometric correction
+- perspective correction / unwarping
+- contrast normalization
+- denoising and background suppression
+- border removal and crop cleanup
+- binarization or adaptive thresholding where useful
+- line / guide / form-mark suppression when those elements hurt OCR
+
+This is one of the biggest reasons a commercial platform can outperform a raw
+open OCR run on messy documents: the recognizer may be seeing a much better
+image.
+
+#### Full document analysis, not just text detection
+
+ABBYY says it analyzes both the page layout and the logical structure of the
+document. Its OCR SDK documentation specifically mentions text blocks, tables,
+table cells, pictures, barcodes, separators, page orientation, double pages,
+vertical text, and non-relevant areas that should be ignored.
+
+To approximate that in Paddle, you would need more than text detection. You
+would also need:
+
+- layout region detection
+- non-text region suppression
+- table detection and reconstruction
+- reading-order recovery
+- header / footer / marginalia handling
+- region-specific OCR decisions
+
+Without that layer, Paddle may read the right characters locally but still
+produce weaker page-level output because the page structure was handled less
+well.
+
+#### Document classification and routing
+
+ABBYY's current OCR/ICR and data extraction pages describe classification as a
+separate step: the system analyzes both image and text features, determines the
+document type, and routes the document to the appropriate extraction model.
+
+To recreate that behavior with Paddle, you would need a routing layer that can
+decide questions like:
+
+- is this page better handled by `PP-OCR`, `PP-Structure`, or `PaddleOCR-VL`
+- is this document a form, article page, ID, invoice, or something else
+- should table parsing or layout-heavy parsing be enabled
+- should different preprocessing or decoding settings be applied to this class
+
+Without routing, Paddle is often evaluated as one fixed pipeline against ABBYY's
+adaptive workflow, which is not an equal comparison.
+
+#### Field-aware extraction instead of plain text dumping
+
+ABBYY's public materials emphasize that OCR and ICR feed extraction. It is not
+only recognizing text; it is recognizing text in the context of expected
+document fields, tables, checkmarks, barcodes, signatures, and related business
+elements.
+
+To get closer with Paddle, you would need application-level logic that can:
+
+- identify which regions correspond to target fields
+- choose the right parser for those regions
+- preserve table and form structure
+- normalize output into field/value representations instead of only free text
+
+This matters because raw OCR text can look worse than ABBYY even when the
+characters are similar, simply because ABBYY is reconstructing structured
+results rather than emitting a flat stream.
+
+#### Validation and constraint checking after recognition
+
+ABBYY explicitly describes a validation stage where extracted data is checked
+against predefined rules and external databases, with human review for more
+complex cases.
+
+To recreate that quality layer around Paddle, you would need post-processing
+such as:
+
+- regex and format validation
+- allowed-character or dictionary checks
+- cross-field consistency rules
+- database or lookup-table verification
+- confidence thresholds that trigger review instead of silent acceptance
+
+This does not improve the raw OCR model directly, but it improves practical
+output quality by catching bad reads before they become final data.
+
+#### Human review for uncertain cases
+
+ABBYY's pipeline includes human-in-the-loop review and continuous learning from
+corrections. That matters because a production-quality result is not only about
+high average accuracy. It is also about safely handling the pages the model is
+not confident about.
+
+To match that with Paddle, you would likely need:
+
+- confidence scoring or heuristics for escalation
+- a review UI or annotation loop
+- corrected-output capture
+- a feedback path for improving prompts, preprocessing, routing, or training
+
+If ABBYY produces fewer bad final outputs, part of the reason may be that it is
+designed to stop and ask for help when confidence is low.
+
+#### Export and reconstruction logic
+
+ABBYY's OCR SDK pages emphasize exact or high-quality reconstruction of the
+document's structure and formatting. That means the final output is shaped by
+layout recovery and export logic, not only by text recognition.
+
+To reproduce that with Paddle, you may need additional code for:
+
+- reading-order reconstruction
+- block merging and region cleanup
+- Markdown / JSON / ALTO shaping
+- table serialization
+- page-level normalization before TXT export
+
+This is especially important in this repo because evaluation quality can be ffected by formatting artifacts, not just by recognition mistakes.
+
+The IntuitionLabs article
+["Technical Analysis of Modern Non-LLM OCR Engines"](https://intuitionlabs.ai/articles/non-llm-ocr-technologies)
+describes FineReader as a long-established commercial OCR leader with strong
+layout analysis, robust PDF conversion, and continued AI-driven improvements.
+That framing matches the way ABBYY often behaves in practice in evaluations: it
+is not only a recognizer, but a mature end-user document workflow with strong
+layout preservation and cleanup.
+
+FineReader remains a strong real-world benchmark for OCR systems
+that need both recognition quality and document-structure preservation.
 
 # Analysis And Helper Scripts
 
