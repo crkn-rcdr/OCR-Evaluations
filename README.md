@@ -988,8 +988,6 @@ comparison. It is usually a platform-vs-pipeline-stack comparison. If you want P
 - safe human-review escalation
 - cleaner export normalization
 
-So a fair ABBYY-vs-Paddle benchmark should record whether Paddle was given these extra supporting steps, because ABBYY's observed quality often depends on them.
-
 So if ABBYY outperforms a model on a document, the difference may come from any
 combination of recognition quality, layout analysis, field constraints,
 validation logic, or workflow-level post-processing, not just from better raw
