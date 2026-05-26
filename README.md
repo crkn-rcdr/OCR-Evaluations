@@ -816,41 +816,6 @@ than only a model-leaderboard question:
 - which extra steps matter most: preprocessing, stronger segmentation, or
   second-pass VL correction
 
-### Plotly visualizations
-
-The comparison workbooks are easier to interpret when graphed. The repo 
-includes [tools/generate_ocr_plots.py](tools/generate_ocr_plots.py), which
-reads the two Excel workbooks and builds a Plotly HTML dashboard:
-
-- [test-results/plots/ocr_evaluation_dashboard.html](test-results/plots/ocr_evaluation_dashboard.html)
-- PNG exports under [test-results/plots/png](test-results/plots/png)
-
-Generate or refresh it with:
-
-```bash
-python tools/generate_ocr_plots.py
-```
-
-The dashboard includes several useful views of the data:
-
-- whole-page line recovery
-  shows how closely each workflow matched ABBYY's line-level coverage
-- whole-page word recovery
-  shows why preprocess-only failed and why `3x2 grid + PP-DocLayoutV3` became the base
-  pipeline
-- whole-page artifact totals
-  compares cleanup quality across the post-OCR VL backends against the ABBYY
-  baseline
-- artifact-category vs ABBYY small multiples
-  shows each Paddle workflow separately, with every artifact category expressed
-  as a percent of ABBYY's count for that same category
-- human-transcription WER/CER scatter
-  shows article-level quality tradeoffs between word error rate and character
-  error rate
-- human-transcription edit breakdown
-  separates substitutions, insertions, and deletions so backend differences are
-  easier to interpret
-
 ## Results
 
 The two comparison workbooks point to a consistent overall story:
@@ -1246,3 +1211,38 @@ python tools/compare_ocr_to_human.py \
   --output-dir test-results \
   --prefix first_article_ocr_comparison
 ```
+
+## Plotly visualizations
+
+The comparison workbooks are easier to interpret when graphed. The repo 
+includes [tools/generate_ocr_plots.py](tools/generate_ocr_plots.py), which
+reads the two Excel workbooks and builds a Plotly HTML dashboard:
+
+- [test-results/plots/ocr_evaluation_dashboard.html](test-results/plots/ocr_evaluation_dashboard.html)
+- PNG exports under [test-results/plots/png](test-results/plots/png)
+
+Generate or refresh it with:
+
+```bash
+python tools/generate_ocr_plots.py
+```
+
+The dashboard includes several useful views of the data:
+
+- whole-page line recovery
+  shows how closely each workflow matched ABBYY's line-level coverage
+- whole-page word recovery
+  shows why preprocess-only failed and why `3x2 grid + PP-DocLayoutV3` became the base
+  pipeline
+- whole-page artifact totals
+  compares cleanup quality across the post-OCR VL backends against the ABBYY
+  baseline
+- artifact-category vs ABBYY small multiples
+  shows each Paddle workflow separately, with every artifact category expressed
+  as a percent of ABBYY's count for that same category
+- human-transcription WER/CER scatter
+  shows article-level quality tradeoffs between word error rate and character
+  error rate
+- human-transcription edit breakdown
+  separates substitutions, insertions, and deletions so backend differences are
+  easier to interpret
