@@ -1,53 +1,6 @@
 # Assessing AI-Powered OCR Tools
 A repo containing data for analyzing open-source PaddleOCR + PaddleVL, olmOCR, Chandra, or Deepseek VL models for correction vs ABBYY FineReader Server 14. 
 
-
-## Analysis And Helper Scripts
-
-### Comparison Tool
-
-The repo includes [tools/compare_ocr_errors.py](tools/compare_ocr_errors.py) for
-Paddle-vs-ABBYY review.
-
-Single-file CSV mode:
-
-```bash
-python tools/compare_ocr_errors.py \
-  --paddle path/to/paddle.txt \
-  --abbyy path/to/abbyy.txt \
-  --output path/to/errors.csv
-```
-
-Folder-to-folder Excel mode:
-
-```bash
-python tools/compare_ocr_errors.py \
-  --paddle-dir test-results/paddlecomp \
-  --abbyy-dir "test-results/large - abby" \
-  --excel-output test-results/paddle_vs_abbyy_errors_artifacts.xlsx
-```
-
-Current Excel behavior:
-
-- one worksheet per matching Paddle TXT file
-- if the target workbook already exists, the script reuses the existing sheet names, freeze panes, column widths, and row heights
-
-
-#### Human Comparison Workbook
-
-[tools/compare_ocr_to_human.py](tools/compare_ocr_to_human.py) compares a human transcription against ABBYY plus every `first-article.txt` found under `test-results/paddlecomp`, then writes a shareable Excel workbook.
-
-Example:
-
-```bash
-python tools/compare_ocr_to_human.py \
-  --human "test-results/large- human/first-article.txt" \
-  --abbyy "test-results/large - abby/first-article.txt" \
-  --paddlecomp-dir test-results/paddlecomp \
-  --output-dir test-results \
-  --prefix first_article_ocr_comparison
-```
-
 ## How ABBYY OCR/ICR Works
 
 The notes below summarize ABBYY's public product documentation reviewed on
@@ -354,22 +307,6 @@ To reproduce that with Paddle, you may need additional code for:
 This is especially important in this repo because evaluation quality can be
 affected by formatting artifacts, not just by recognition mistakes.
 
-#### Practical implication
-
-If you want Paddle to get closer to ABBYY, the gap to close is usually not only
-"better OCR." It is a bundle of surrounding capabilities:
-
-- stronger preprocessing
-- stronger layout analysis
-- better pipeline routing
-- more structure-aware extraction
-- stricter validation
-- safe human-review escalation
-- cleaner export normalization
-
-So a fair ABBYY-vs-Paddle benchmark should record whether Paddle was given these
-extra supporting steps, because ABBYY's observed quality often depends on them.
-
 ### ABBYY FineReader PDF as the desktop OCR benchmark
 
 The ABBYY discussion above is mostly about ABBYY's broader OCR SDK and
@@ -399,17 +336,6 @@ So the safe summary is that FineReader's language counts and feature packaging
 can differ by platform, and the Windows and Mac products should not be treated
 as identical based on one secondary source alone.
 
-For this repo, the most important FineReader points are the ones that affect OCR
-comparisons directly:
-
-- strong page and layout analysis for columns, tables, headers, footers, and
-  mixed document structure
-- aggressive image cleanup and OCR-oriented preprocessing
-- mature export and reconstruction into searchable PDF and editable formats
-- broad multilingual support
-- good performance on low-quality scans and complex business or archival
-  documents
-
 The IntuitionLabs article also describes FineReader as using neural OCR
 components, possibly in a multi-engine setup that combines newer LSTM-based
 recognition with older ABBYY logic. That is a useful external interpretation,
@@ -417,8 +343,7 @@ but it should be read as informed analysis rather than fully confirmed ABBYY
 technical disclosure. ABBYY's public product materials are much clearer about
 capabilities than about exact internal model architecture.
 
-In other words, FineReader is relevant here not because every internal detail is
-public, but because it remains a strong real-world benchmark for OCR systems
+FineReader remains a strong real-world benchmark for OCR systems
 that need both recognition quality and document-structure preservation.
 
 Sources:
@@ -1292,4 +1217,60 @@ first problem. The remaining differences were mostly about how well each
 follow-up backend corrected the noise introduced by tiling strategies and base PaddleOCR model.
 
 The main lesson is that ABBYY vs Paddle is not just a model-vs-model
-comparison. It is usually a platform-vs-pipeline-stack comparison.
+comparison. It is usually a platform-vs-pipeline-stack comparison. If you want Paddle to get closer to ABBYY, the gap to close is usually not only "better OCR." It is a bundle of surrounding capabilities:
+
+- stronger preprocessing
+- stronger layout analysis
+- better pipeline routing
+- more structure-aware extraction
+- stricter validation
+- safe human-review escalation
+- cleaner export normalization
+
+So a fair ABBYY-vs-Paddle benchmark should record whether Paddle was given these extra supporting steps, because ABBYY's observed quality often depends on them.
+
+# Analysis And Helper Scripts
+
+## Comparison Tool
+
+The repo includes [tools/compare_ocr_errors.py](tools/compare_ocr_errors.py) for
+Paddle-vs-ABBYY review.
+
+Single-file CSV mode:
+
+```bash
+python tools/compare_ocr_errors.py \
+  --paddle path/to/paddle.txt \
+  --abbyy path/to/abbyy.txt \
+  --output path/to/errors.csv
+```
+
+Folder-to-folder Excel mode:
+
+```bash
+python tools/compare_ocr_errors.py \
+  --paddle-dir test-results/paddlecomp \
+  --abbyy-dir "test-results/large - abby" \
+  --excel-output test-results/paddle_vs_abbyy_errors_artifacts.xlsx
+```
+
+Current Excel behavior:
+
+- one worksheet per matching Paddle TXT file
+- if the target workbook already exists, the script reuses the existing sheet names, freeze panes, column widths, and row heights
+
+
+## Human Comparison Workbook
+
+[tools/compare_ocr_to_human.py](tools/compare_ocr_to_human.py) compares a human transcription against ABBYY plus every `first-article.txt` found under `test-results/paddlecomp`, then writes a shareable Excel workbook.
+
+Example:
+
+```bash
+python tools/compare_ocr_to_human.py \
+  --human "test-results/large- human/first-article.txt" \
+  --abbyy "test-results/large - abby/first-article.txt" \
+  --paddlecomp-dir test-results/paddlecomp \
+  --output-dir test-results \
+  --prefix first_article_ocr_comparison
+```
