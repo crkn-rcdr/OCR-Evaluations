@@ -773,7 +773,7 @@ The `3x2 grid + PP-DocLayoutV3 only` run changed that completely:
 - Paddle word count: `16685`
 - ABBYY word count: `15999`
 
-That is why `3x2 grid + PP-DocLayoutV3` was kept for all runs. It brought the page back to roughly the same scale of recoverable content as ABBYY. For the remainder of the dicussion it will be labeled as the `PaddleOCR (No VL)` run. 
+That is why `3x2 grid + PP-DocLayoutV3` was kept for all subsequent runs. It brought the page back to roughly the same scale of recoverable content as ABBYY. For the remainder of the dicussion it will be labeled as the `PaddleOCR (No VL)` run. 
 
 ![Whole-page line recovery](test-results/plots/png/line_count_recovery.png)
 
