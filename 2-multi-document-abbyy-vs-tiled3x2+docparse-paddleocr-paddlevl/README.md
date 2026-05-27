@@ -145,6 +145,20 @@ The source image for that page is visually straightforward: long prose columns, 
 
 That is a good sign for Paddle when the goal is readable running text rather than conservative preservation of every printed fragment.
 
+Additional examples from this dataset:
+
+`oocihm.N_00155_18750610.4`: Paddle `130` vs ABBYY `209`. This is another text-heavy multi-column page with little display ornament. Paddle still has more separator noise (`66` vs `18`), but ABBYY is much worse on `suspicious glyph` (`176` vs `33`). Workbook: [oocihm.N_00155_18750610.4.xlsx](test-results/page-level-excels/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.xlsx)
+
+![Additional Paddle-better example: oocihm.N_00155_18750610.4](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
+
+`oocihm.N_00155_18880712.3`: Paddle `35` vs ABBYY `94`. This is another prose-leaning page where ABBYY's glyph and punctuation debris dominate: `suspicious glyph` `67` vs `7`, `punctuation artifact` `14` vs `2`. Workbook: [oocihm.N_00155_18880712.3.xlsx](test-results/page-level-excels/oocihm.N_00155_18880712/oocihm.N_00155_18880712.3.xlsx)
+
+![Additional Paddle-better example: oocihm.N_00155_18880712.3](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.3.jpg)
+
+`aeu.00037_19470820.7`: Paddle `912` vs ABBYY `1033`. Visually this is a grade-list page with tightly packed names plus article text at the bottom. It is noisy for both systems, but ABBYY's `punctuation artifact` count explodes (`575` vs `7`) and its glyph corruption is also higher (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
+
+![Additional Paddle-better example: aeu.00037_19470820.7](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.7.jpg)
+
 ### Where ABBYY Looks Better
 
 `oocihm.N_00219_18600707` is the clearest case against Paddle. The worst page is `oocihm.N_00219_18600707.3`, where Paddle has `643` artifact entries and ABBYY has `408`.
@@ -161,6 +175,20 @@ The source image is a very dense classified-style page with many narrow columns,
 
 ABBYY is not clean on that page either, but Paddle's extra recovery turns into a large amount of low-value text debris.
 
+Additional examples from this dataset:
+
+`oocihm.N_00138_18940629.5`: Paddle `313` vs ABBYY `159`. Visually this is a mixed page with article columns and large display ads. The main difference in the counts is separator-heavy extraction: `isolated marker/separator` `243` vs `86`. Workbook: [oocihm.N_00138_18940629.5.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.xlsx)
+
+![Additional ABBYY-better example: oocihm.N_00138_18940629.5](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.jpg)
+
+`oocihm.N_00219_18600707.4`: Paddle `249` vs ABBYY `171`. This is another mixed notice-and-ad page rather than a plain prose page. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because of much higher `isolated marker/separator` (`136` vs `37`) plus more token mismatches and suspicious tokens. Workbook: [oocihm.N_00219_18600707.4.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.4.xlsx)
+
+![Additional ABBYY-better example: oocihm.N_00219_18600707.4](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.4.jpg)
+
+`oocihm.22250.160`: Paddle `90` vs ABBYY `40`. This is not a classified page. It is a fee-schedule / tabular text page with many dot leaders and aligned amounts, and almost the entire gap is separator-like debris (`87` vs `34`) rather than glyph corruption. Workbook: [oocihm.22250.160.xlsx](test-results/page-level-excels/oocihm.22250/oocihm.22250.160.xlsx)
+
+![Additional ABBYY-better example: oocihm.22250.160](test-data/abbyy/oocihm.22250/0160.jpg)
+
 ### Mixed Case: Name Lists, Fine Print, and Ads
 
 `oocihm.N_00138_18940629.7` is a useful mixed example. The page combines dense name lists, small print, and boxed advertisements. Paddle finishes with `140` artifact entries versus `301` for ABBYY, even though Paddle still has more separator noise.
@@ -175,6 +203,20 @@ The main reason is that ABBYY's output degrades sharply into glyph-like corrupti
 - `isolated marker/separator`: Paddle `65`, ABBYY `21`
 
 This shows the systems are not trading off the same failure type. Paddle often preserves too many printable fragments; ABBYY more often collapses into garbled character output.
+
+Additional examples from this dataset:
+
+`oocihm.N_00138_18940629.8`: Paddle `217` vs ABBYY `248`. Paddle is still ahead overall, but not cleanly: it has more `isolated marker/separator` (`123` vs `78`), while ABBYY is worse on `suspicious glyph` (`97` vs `32`) and `punctuation artifact` (`57` vs `24`). Workbook: [oocihm.N_00138_18940629.8.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.8.xlsx)
+
+![Additional mixed-case example: oocihm.N_00138_18940629.8](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.8.jpg)
+
+`oocihm.N_00219_18600707.2`: Paddle `241` vs ABBYY `208`. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because its separator count is much higher (`180` vs `80`) and it introduces more OCR token mismatches (`14` vs `1`). Workbook: [oocihm.N_00219_18600707.2.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.2.xlsx)
+
+![Additional mixed-case example: oocihm.N_00219_18600707.2](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.2.jpg)
+
+`aeu.00037_19470820.7`: Paddle `912` vs ABBYY `1033`. This is a good hybrid example because Paddle is much worse on separators (`643` vs `359`), but ABBYY is dramatically worse on punctuation (`575` vs `7`) and still worse on glyph corruption (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
+
+![Additional mixed-case example: aeu.00037_19470820.7](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.7.jpg)
 
 ## How To Read The Counts
 
