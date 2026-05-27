@@ -102,6 +102,7 @@ This chart explains why the totals alone are not enough. Paddle and ABBYY are no
 ### 4. Biggest Page-Level Swings
 
 This is the best chart for identifying representative outlier pages.
+Red bars mean Paddle had more tagged artifacts on that page, gray bars mean ABBYY had more, and the dashed center line is zero difference.
 
 ![Largest Page-Level Artifact Deltas](test-results/plots/png/page_artifact_delta.png)
 

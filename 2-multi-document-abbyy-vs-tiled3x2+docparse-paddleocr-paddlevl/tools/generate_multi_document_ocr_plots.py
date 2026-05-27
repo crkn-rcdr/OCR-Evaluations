@@ -620,21 +620,49 @@ def build_page_delta_figure(rows: list[PageSummary]) -> go.Figure:
     labels = [row.label for row in ordered][::-1]
     delta_values = [(row.paddle_entries - row.abbyy_entries) for row in ordered][::-1]
     customdata = [[row.paddle_entries, row.abbyy_entries] for row in ordered][::-1]
-    colors = ["#BC4749" if value > 0 else "#6C757D" for value in delta_values]
+    positive_values = [value if value > 0 else None for value in delta_values]
+    negative_values = [value if value < 0 else None for value in delta_values]
 
     figure = go.Figure()
     figure.add_trace(
         go.Bar(
-            x=delta_values,
+            name="Paddle higher artifact count",
+            x=positive_values,
             y=labels,
             orientation="h",
-            marker_color=colors,
+            marker_color="#BC4749",
             customdata=customdata,
             hovertemplate=(
                 "%{y}<br>Delta (Paddle - ABBYY): %{x}"
                 "<br>Paddle: %{customdata[0]}"
                 "<br>ABBYY: %{customdata[1]}<extra></extra>"
             ),
+        )
+    )
+    figure.add_trace(
+        go.Bar(
+            name="ABBYY higher artifact count",
+            x=negative_values,
+            y=labels,
+            orientation="h",
+            marker_color="#6C757D",
+            customdata=customdata,
+            hovertemplate=(
+                "%{y}<br>Delta (Paddle - ABBYY): %{x}"
+                "<br>Paddle: %{customdata[0]}"
+                "<br>ABBYY: %{customdata[1]}<extra></extra>"
+            ),
+        )
+    )
+    figure.add_trace(
+        go.Scatter(
+            x=[None],
+            y=[None],
+            mode="lines",
+            line=dict(color="#666666", width=2, dash="dash"),
+            name="Zero baseline",
+            showlegend=True,
+            hoverinfo="skip",
         )
     )
     figure.add_vline(x=0, line_dash="dash", line_color="#666666")
@@ -644,6 +672,7 @@ def build_page_delta_figure(rows: list[PageSummary]) -> go.Figure:
         template="plotly_white",
         margin=dict(l=280, r=30, t=50, b=70),
         height=900,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
     )
     return figure
 
