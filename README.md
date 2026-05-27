@@ -1,5 +1,5 @@
 # Assessing AI-Powered OCR Tools
-A repo containing data for analyzing open-source PaddleOCR + PaddleVL, olmOCR, Chandra, or Deepseek VL models for correction vs ABBYY FineReader Server 14. 
+A repo containing data for analyzing the open-source PaddleOCR engine along with PaddleVL, olmOCR, Chandra, or Deepseek VL models for low confidence word correction vs ABBYY FineReader Server 14. 
 
 ## How ABBYY OCR/ICR Works
 
