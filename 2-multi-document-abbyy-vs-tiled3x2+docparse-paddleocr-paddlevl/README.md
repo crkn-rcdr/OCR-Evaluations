@@ -101,7 +101,7 @@ This chart explains why the totals alone are not enough. Paddle and ABBYY are no
 
 ### 4. Biggest Page-Level Swings
 
-This is the best chart for identifying representative outlier pages to inspect manually. It is what points you toward pages like `oocihm.N_00219_18600707.3` and `oocihm.N_00155_18880712.6`.
+This is the best chart for identifying representative outlier pages.
 
 ![Largest Page-Level Artifact Deltas](test-results/plots/png/page_artifact_delta.png)
 
