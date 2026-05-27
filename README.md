@@ -32,14 +32,6 @@ orientation, double pages, vertical text, headers, footers, and other
 formatting elements. This step is what lets ABBYY preserve structure instead of
 returning only a flat text dump.
 
-In practice, this matters because ABBYY is not only trying to answer "what
-characters are on the page?" It is also trying to answer:
-
-- which regions are text versus non-text
-- which text belongs to tables or fields
-- which regions should be ignored
-- how the original reading order and document structure should be reconstructed
-
 ### 3. OCR for printed text
 
 ABBYY uses OCR for machine-printed text. On its official pages, ABBYY states
@@ -48,7 +40,7 @@ document conversion and field extraction. The engine is intended to work on
 complex documents, not just simple paragraphs, so tables, mixed layouts, and
 special fonts are part of the intended use case.
 
-For repository comparisons, ABBYY OCR should be thought of as a combination of:
+ABBYY OCR should be thought of as a combination of:
 
 - image preprocessing
 - page segmentation and layout detection
@@ -66,13 +58,6 @@ letters or digits written as separate printed characters in fields or zones,
 such as form entries, boxed values, or constrained handwriting areas. ABBYY
 also notes that ICR is commonly tied to field-level or zonal recognition rather
 than unconstrained full-page handwriting transcription.
-
-That distinction is important when evaluating results:
-
-- ABBYY ICR is strong for structured hand-print input
-- it is not the same as general handwritten manuscript recognition
-- accuracy improves when the target zone and expected content are known in
-  advance
 
 ### 5. Field-level recognition and extraction
 
@@ -141,13 +126,6 @@ processing, but not on the assumption that every page can be handled with zero
 review. The system is built to escalate uncertain cases instead of silently
 accepting bad data.
 
-### 9. Output and downstream use
-
-Once content is recognized, structured, and validated, ABBYY exports it into
-formats such as JSON, CSV, and XML, or sends it into downstream systems through
-APIs and connectors. That makes the end product more than OCR text alone: the
-real deliverable is structured data aligned to business workflows.
-
 Sources:
 
 - https://www.abbyy.com/ai-document-processing/ocr-icr/
@@ -159,6 +137,7 @@ Sources:
 - https://intuitionlabs.ai/articles/non-llm-ocr-technologies
 - https://help.abbyy.com/assets/en-us/finereader/16/Users_Guide.pdf
 - https://support.abbyy.com/hc/en-us/articles/360020669679-Specifications-for-FineReader-PDF-for-Mac
+- https://intuitionlabs.ai/articles/non-llm-ocr-technologies
 
 ## How Paddle Works
 
@@ -218,6 +197,8 @@ This modular design is important because the OCR result is influenced by more
 than the recognizer itself. Rotation handling, unwarping, text detection, and
 line orientation correction can all change final accuracy.
 
+PP-OCR does give word level content boxes.
+
 For our experiment, we used [PP-v5OCR](https://huggingface.co/collections/PaddlePaddle/pp-ocrv5).
 
 #### What PP-OCR is good at
@@ -266,6 +247,8 @@ well:
 
 For repo comparisons, PP-Structure is the Paddle component most analogous to
 the structure-preserving part of ABBYY's document workflow.
+
+PP-Structure does not give word level content boxes.
 
 ### 4. Paddle DocParser / PP-DocLayoutV3: the PaddleOCR-VL document parsing pipeline
 
@@ -333,6 +316,8 @@ For difficult pages, that can make PaddleOCR-VL stronger than a plain OCR stack,
 but it also means more complexity, heavier inference, and different failure
 modes such as hallucinated structured text if the pipeline is misused.
 
+PaddleOCR-VL also does not give word level content boxes.
+
 Sources:
 
 - https://www.paddleocr.ai/main/en/index.html
@@ -345,18 +330,11 @@ Sources:
 
 ## ABBYY vs Paddle
 
-This section compares ABBYY against Paddle as they are most relevant to this
-repo. "Paddle" here does not mean one thing: it can mean `PP-OCR`,
-`PP-Structure`, or `doc_parser` / `PaddleOCR-VL`, all orchestrated through
-`PaddleX`.
+This section compares ABBYY against Paddle as they are most relevant to this repo. "Paddle" here does not mean one thing: it can mean `PP-OCR`, `PP-Structure`, or `doc_parser` / `PaddleOCR-VL`, all orchestrated through `PaddleX`.
 
 ### High-level difference
 
-At a high level, ABBYY is a commercial document processing platform with OCR or
-ICR embedded inside a broader validation and workflow system. Paddle is an
-open-source model and pipeline stack that gives you several document-reading
-paths, but generally expects more explicit configuration and evaluation work
-from the user.
+At a high level, ABBYY is a commercial document processing platform with OCR or ICR embedded inside a broader validation and workflow system. Paddle is an open-source model and pipeline stack that gives you several document-reading paths, but generally expects more explicit configuration and evaluation work from the user.
 
 That leads to a practical distinction:
 
@@ -365,42 +343,36 @@ That leads to a practical distinction:
 
 ### Where ABBYY is stronger
 
-ABBYY tends to be stronger when the document problem is not only "read the
-text" but "extract reliable business data from messy documents with controls."
+ABBYY tends to be stronger when the document problem is not only "read the text" but "extract reliable business data from messy documents with controls."
 
 Its advantages include:
 
-- mature commercial OCR and ICR focused on business documents
 - strong layout and field-aware extraction behavior
 - built-in validation concepts such as rules, dictionaries, expected formats,
   and external record checks
-- optional human review workflows for uncertain cases
 - a more integrated path from ingestion to structured output
+- mature commercial OCR and ICR focused on business documents
+- optional human review workflows for uncertain cases
 
-In other words, ABBYY often wins by combining recognition with structure,
-constraints, and workflow-level quality control.
+In other words, ABBYY often wins by combining recognition with structure, constraints, and workflow-level quality control.
 
 ### Where Paddle is stronger
 
-Paddle tends to be stronger when you want openness, flexibility, and control
-over how the OCR stack is assembled.
+Paddle tends to be stronger when you want openness, flexibility, and control over how the OCR stack is assembled.
 
 Its advantages include:
 
 - open-source access to models and pipelines
-- multiple operating modes for different tasks
 - easier experimentation across OCR-first and VLM-based approaches
 - direct control over preprocessing, layout analysis, and pipeline selection
 - easier integration into custom research or engineering workflows without a
   commercial platform dependency
 
-In this repo specifically, Paddle is useful because it exposes more of the
-pipeline knobs that can be tuned, swapped, or inspected during benchmarking.
+In this repo specifically, Paddle is useful because it exposes more of the pipeline knobs that can be tuned, swapped, or inspected during benchmarking.
 
 ### OCR philosophy: integrated platform vs modular stack
 
-ABBYY and Paddle are solving related problems, but they package the solution
-very differently.
+ABBYY and Paddle are solving related problems, but they package the solution very differently.
 
 ABBYY behaves more like an integrated platform:
 
@@ -419,49 +391,33 @@ Paddle behaves more like a toolkit with multiple tiers:
 - `PaddleOCR-VL` for VLM-based parsing
 - `PaddleX` for pipeline orchestration and deployment
 
-That means ABBYY usually presents a more unified workflow, while Paddle gives
-you more freedom to choose which pipeline style to run.
+That means ABBYY usually presents a more unified workflow, while Paddle gives you more freedom to choose which pipeline style to run.
 
 ### Structured documents
 
-Both ABBYY and Paddle care about document structure, but they get there
-differently.
+Both ABBYY and Paddle care about document structure, but they get there differently.
 
-ABBYY's structure handling is part of a business-document platform and is tied
-closely to extraction and validation. 
+ABBYY's structure handling is part of a business-document platform and is tied closely to extraction and validation. 
 
-Paddle splits the problem into separate
-pipelines:
+Paddle splits the problem into separate pipelines:
 
 - `PP-OCR` for raw text reading
 - `PP-Structure` for layout-aware structured parsing
 - `PaddleOCR-VL` for richer VLM-based parsing
 
-So if Paddle underperforms ABBYY on a complex page, the reason may simply be
-that the comparison used `PP-OCR` when the more appropriate Paddle baseline was
-`PP-Structure` or `PaddleOCR-VL`.
+So if Paddle underperforms ABBYY on a complex page, the reason may simply be that the comparison used `PP-OCR` when the more appropriate Paddle baseline was `PP-Structure` or `PaddleOCR-VL`.
 
 ### Handwriting and ICR
 
-ABBYY can support ICR for structured hand-printed text fields. That is
-important for forms, boxed entries, and constrained handwriting zones.
+ABBYY can support ICR for structured hand-printed text fields. That is important for forms, boxed entries, and constrained handwriting zones.
 
-Paddle 3.x documentation explicitly describes pipelines as improving
-recognition for multiple text types, including handwriting, and the PaddleOCR
-model and pipeline family includes handwriting-relevant recognition support in
-addition to printed-text OCR. 
+Paddle 3.x documentation explicitly describes pipelines as improving recognition for multiple text types, including handwriting, and the PaddleOCR model and pipeline family includes handwriting-relevant recognition support in addition to printed-text OCR. 
 
-PaddleOCR-VL also broadens this further by using a document VLM that can recognize and parse more varied document content than a
-classical printed-text-only OCR stack.
+PaddleOCR-VL also broadens this further by using a document VLM that can recognize and parse more varied document content than a classical printed-text-only OCR stack.
 
-The more accurate distinction is narrower: ABBYY's product framing is still more
-explicitly tied to structured business-document ICR for constrained hand-printed fields, while Paddle's current public framing is broader handwriting/HTR-aware OCR and document parsing rather than ABBYY-style field-oriented ICR as a
-first-class product concept. 
+The more accurate distinction is narrower: ABBYY's product framing is still more explicitly tied to structured business-document ICR for constrained hand-printed fields, while Paddle's current public framing is broader handwriting/HTR-aware OCR and document parsing rather than ABBYY-style field-oriented ICR as a first-class product concept. 
 
-So if a benchmark depends heavily on boxed
-hand-printed field extraction, ABBYY may still have an advantage in product
-design and workflow assumptions, even though Paddle is not limited to
-printed-text-only OCR.
+So if a benchmark depends heavily on boxed hand-printed field extraction, ABBYY may still have an advantage in product design and workflow assumptions, even though Paddle is not limited to printed-text-only OCR.
 
 ### Validation and trust model
 
@@ -504,8 +460,7 @@ Paddle failure modes vary by pipeline:
 - `PaddleOCR-VL` can introduce VLM-style errors, including incorrect structured
   reconstruction or over-generated text if the full pipeline is not used well
 
-So a fair comparison should identify not just whether output is wrong, but what
-kind of system design issue caused the discrepancy.
+So a fair comparison should identify not just whether output is wrong, but what kind of system design issue caused the discrepancy.
 
 ### Cost and control
 
@@ -625,13 +580,9 @@ so Paddle needed extra supporting steps to get closer.
 
 ### Methodologies
 
-Comparing Paddle OCR with ABBYY on this page required more than switching OCR
-models. The testing in this repo is built around a Paddle OCR expirement pipeline which includes stages to: improve the page before OCR, reduce page scale
-problems with tiling, optionally route crops through layout-aware parsing, and
-then apply targeted cleanup or second-pass correction.
+Comparing Paddle OCR with ABBYY on this page required more than switching OCR models. The testing in this repo is built around a Paddle OCR expirement pipeline which includes stages to: improve the page before OCR, reduce page scale problems with tiling, optionally route crops through layout-aware parsing, and then apply targeted cleanup or second-pass correction.
 
-At a high level, the variants in `test-results/paddlecomp` represent this
-progression:
+At a high level, the variants in `test-results/paddlecomp` represent this progression:
 
 - baseline PP-OCR with lighter preprocessing
 - PP-OCR with heavier segmentation through tiling and DocLayout
@@ -690,9 +641,7 @@ results overall than this lighter combination.
 
 #### Tiling
 
-Large broadsheet pages are one of the main reasons tiling was necessary. The rationale is straightforward: when the full page is too large and the text
-too small, splitting the page into smaller regions gives the recognizer more
-effective resolution per text line.
+Large broadsheet pages are one of the main reasons tiling was necessary. The rationale is straightforward: when the full page is too large and the text too small, splitting the page into smaller regions gives the recognizer more effective resolution per text line.
 
 For this repo, the important tile variants are:
 
@@ -771,10 +720,6 @@ word-recognition failures but still hurt readability and comparison:
 - broken quotes
 - repeated punctuation
 - punctuation glued to adjacent text incorrectly
-
-That matters in this repo because the downstream comparisons are text-based.
-Even when a word is essentially correct, punctuation noise can inflate apparent
-error counts or make human review harder.
 
 ### Comparisons
 
@@ -970,15 +915,11 @@ The results suggest a set of conclusions:
   results among the Paddle-centered variants
 - `ABBYY` still had the best overall transcription quality in the current test
 
-So the main gap between raw Paddle OCR and ABBYY on this page was first a
-coverage problem, then a cleanup problem. 
+So the main gap between raw Paddle OCR and ABBYY on this page was first a coverage problem, then a cleanup problem. 
 
-Tiling plus layout parsing solved the
-first problem. The remaining differences were mostly about how well each
-follow-up backend corrected the noise introduced by tiling strategies and base PaddleOCR model.
+Tiling plus layout parsing solved the first problem. The remaining differences were mostly about how well each follow-up backend corrected the noise introduced by tiling strategies and base PaddleOCR model.
 
-The main lesson is that ABBYY vs Paddle is not just a model-vs-model
-comparison. It is usually a platform-vs-pipeline-stack comparison. If you want Paddle to get closer to ABBYY, the gap to close is usually not only "better OCR." It is a bundle of surrounding capabilities:
+The main lesson is that ABBYY vs Paddle is not just a model-vs-model comparison. It is usually a platform-vs-pipeline-stack comparison. If you want Paddle to get closer to ABBYY, the gap to close is usually not only "better OCR." It is a bundle of surrounding capabilities:
 
 - stronger preprocessing
 - stronger layout analysis
@@ -996,7 +937,7 @@ character classification.
 #### What ABBYY does around the document that Paddle users would need to recreate
 
 If the goal is to get Paddle closer to ABBYY-quality end-to-end OCR on difficult
-documents, it is not enough to compare ABBYY against a bare OCR recognizer.
+documents, it is not enough to compare ABBYY against a Paddle's bare OCR recognizer.
 ABBYY's own document-processing pages describe several surrounding stages that
 materially affect recognition quality and output quality.
 
@@ -1077,9 +1018,7 @@ To get closer with Paddle, you would need application-level logic that can:
 - preserve table and form structure
 - normalize output into field/value representations instead of only free text
 
-This matters because raw OCR text can look worse than ABBYY even when the
-characters are similar, simply because ABBYY is reconstructing structured
-results rather than emitting a flat stream.
+Raw OCR text can look worse than ABBYY even when the characters are similar, simply because ABBYY is reconstructing structured results rather than emitting a flat stream.
 
 ##### Validation and constraint checking after recognition
 
@@ -1129,19 +1068,9 @@ To reproduce that with Paddle, you may need additional code for:
 - Markdown / JSON / ALTO shaping
 - table serialization
 - page-level normalization before TXT export
+- PDF creation (Including PDF/A - 1a)
 
 This is especially important in this repo because evaluation quality can be ffected by formatting artifacts, not just by recognition mistakes.
-
-The IntuitionLabs article
-["Technical Analysis of Modern Non-LLM OCR Engines"](https://intuitionlabs.ai/articles/non-llm-ocr-technologies)
-describes FineReader as a long-established commercial OCR leader with strong
-layout analysis, robust PDF conversion, and continued AI-driven improvements.
-That framing matches the way ABBYY often behaves in practice in evaluations: it
-is not only a recognizer, but a mature end-user document workflow with strong
-layout preservation and cleanup.
-
-FineReader remains a strong real-world benchmark for OCR systems
-that need both recognition quality and document-structure preservation.
 
 ## Analysis And Helper Scripts
 
