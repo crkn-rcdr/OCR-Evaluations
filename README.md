@@ -598,16 +598,7 @@ The goal was not only to increase raw character accuracy, but also to reduce:
 #### Pre-processing
 
 Historical pages often benefit from mild cleanup before local OCR.
-That repo's defaults and presets include steps such as:
-
-- `light_clean`
-- `background_flatten`
-- `contrast` / CLAHE
-- `deskew`
-- `sauvola_binary`
-- black-border cropping before OCR
-
-In plain terms, those options mean:
+We looked at a few preprocessing steps such as:
 
 - `light_clean` applies a very light denoising pass to remove small scanner
   grime and speckle without heavily changing the page
