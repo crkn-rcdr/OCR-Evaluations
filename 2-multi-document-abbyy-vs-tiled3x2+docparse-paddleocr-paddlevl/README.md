@@ -423,6 +423,42 @@ The current evidence favors a conditional recommendation rather than a blanket o
 - For dense classifieds, notices, and pages where a lot of printed structure is not real body text, ABBYY still looks safer
 - If the Paddle workflow remains the default, the most valuable next cleanup target is separator/fragment suppression on classified-style pages
 
+## Questions
+
+### Document Matrix: ABBYY Vs 3x2
+
+### Paddle More Words And Less Artifacts
+
+- `aeu.00037_19470820`: `3x2` has `37,460` words versus `32,046` for ABBYY, a gain of `5,414` words. Artifact totals also favor `3x2`: `4,103` artifact entries versus `4,106` for ABBYY.
+
+![Representative more-words less-artifacts page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
+
+- `oocihm.N_00155_18880712`: `3x2` has `53,790` words versus `49,224` for ABBYY, a gain of `4,566` words. Artifact totals also favor `3x2`: `451` artifact entries versus `865` for ABBYY.
+
+![Representative more-words less-artifacts page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
+
+- `oocihm.N_00155_18750610`: `3x2` has `62,179` words versus `59,391` for ABBYY, a gain of `2,788` words. Artifact totals also favor `3x2`: `797` artifact entries versus `921` for ABBYY.
+
+![Representative more-words less-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
+
+### Paddle More Words And More Artifacts
+
+- `oocihm.22250`: `3x2` has `91,399` words versus `75,671` for ABBYY, a gain of `15,728` words. Artifact totals cut the other way: `2,204` artifact entries for `3x2` versus `1,937` for ABBYY.
+
+![Representative more-words more-artifacts page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
+
+- `oocihm.N_00219_18600707`: `3x2` has `21,460` words versus `19,477` for ABBYY, a gain of `1,983` words. Artifact totals also lean toward ABBYY: `1,334` artifact entries for `3x2` versus `942` for ABBYY.
+
+![Representative more-words more-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
+
+### Paddle Less Words And Less Artifacts
+
+There are no document-level examples in this dataset.
+
+### Paddle Less Words And More Artifacts
+
+There are no document-level examples in this dataset.
+
 ## Regenerating The Results
 
 Run:

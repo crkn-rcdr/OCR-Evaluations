@@ -280,6 +280,10 @@ By aggregate artifact count, the ordering is clear:
 
 ![Paddle Variant Artifact Totals](test-results/plots/png/paddle_variants_artifact_totals.png)
 
+Raw document word counts tell the complementary story: `3x2` is the highest-volume run, `3x1` is next, no tiling is lower, and ABBYY sits between the tiled and no-tiling variants depending on the document.
+
+![Paddle Variant Word Counts vs ABBYY](test-results/plots/png/paddle_variants_abbyy_word_counts.png)
+
 But once ABBYY token coverage is used as the recall check, no tiling drops behind both tiled variants:
 
 - `3x2` ABBYY token coverage: `93.80%`
