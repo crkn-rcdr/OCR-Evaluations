@@ -143,32 +143,6 @@ So the no-tiling run is not simply “better on clean prose and worse on hard la
 - no tiling sharply suppresses some of the duplicated or fragmented text behavior that tiling introduced
 - but it also gives up too much consistent coverage across the full corpus
 
-## Which Is Better?
-
-If the question is only “which Paddle variant has the fewest tagged artifacts?”, the answer is no tiling:
-
-- no tiling artifact entries: `7,874`
-- `3x1` artifact entries: `10,614`
-- `3x2` artifact entries: `10,999`
-
-If the question is “which Paddle variant is most like ABBYY in recovered vocabulary?”, no tiling is not the answer:
-
-- `3x2` ABBYY token-occurrence coverage: `93.80%`
-- `3x1` ABBYY token-occurrence coverage: `92.98%`
-- no-tiling ABBYY token-occurrence coverage: `79.37%`
-
-If the question is `which Paddle variant stays closest to ABBYY's page size and token mix?`, `3x1` still has the best balance. That is a different metric from maximizing captured words:
-
-- token precision vs ABBYY: `3x1 = 90.56%`, `3x2 = 84.45%`, no tiling `80.03%`
-- pages closest to ABBYY word count: `3x1 = 165`, `3x2 = 24`, no tiling `21`
-
-So the practical answer is:
-
-- no tiling is the cleanest
-- `3x1` is still the best balanced
-- `3x2` is still the most expansive
-- if total unique words captured is the priority, `3x2` is the best choice: it has the highest ABBYY unique-token coverage at `90.61%`, ahead of `3x1` at `90.19%` and no tiling at `82.15%`
-
 ## No Tiling vs 3x1 vs 3x2
 
 The cross-run comparison changes the recommendation.
