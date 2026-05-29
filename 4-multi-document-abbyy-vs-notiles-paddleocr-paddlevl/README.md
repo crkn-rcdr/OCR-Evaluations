@@ -87,7 +87,7 @@ Its failure pattern is still recognizably Paddle-like:
 
 But no tiling is much lighter than the tiled runs on exactly the categories that made them look noisy:
 
-- `duplicate/tile overlap`: `32`
+- `Possible duplicate lines`: `32`
 - `punctuation artifact`: `126`
 - `suspicious glyph`: `2,652`
 

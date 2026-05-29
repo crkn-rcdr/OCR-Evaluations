@@ -62,7 +62,7 @@ JUNK_CHARS = set("\ufeff•□口子广福是心醒。，；：？−€")
 
 ERROR_TYPE_ORDER = [
     "reading order",
-    "duplicate/tile overlap",
+    "Possible duplicate lines",
     "OCR token/phrase mismatch",
     "suspicious token",
     "suspicious glyph",
@@ -534,7 +534,7 @@ def error_type_for_reason(reason: str) -> str:
     if reason.startswith("reading-order artifact"):
         return "reading order"
     if reason.startswith("tile/overlap") or reason.startswith("possible duplicated/overlap"):
-        return "duplicate/tile overlap"
+        return "Possible duplicate lines"
     if reason.startswith("candidate OCR token mismatch") or reason.startswith(
         "localized OCR phrase divergence"
     ):

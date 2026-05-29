@@ -66,7 +66,7 @@ That coverage difference matters. Paddle is usually producing more OCR text than
 The biggest pattern differences:
 
 - Paddle produces far more `isolated marker/separator` entries: `6,034` vs `2,962`
-- Paddle produces all detected `duplicate/tile overlap` entries: `107` vs `0`
+- Paddle produces all detected `Possible duplicate lines` entries: `107` vs `0`
 - ABBYY produces far more `suspicious glyph` entries: `6,017` vs `3,316`
 - ABBYY produces far more `punctuation artifact` entries: `2,386` vs `520`
 - ABBYY produces more `line-start artifact` entries: `298` vs `15`

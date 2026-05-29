@@ -68,7 +68,7 @@ ALLOWED_NONASCII = set("’‘“”—–£àéèêôûç°«»")
 JUNK_CHARS = set("\ufeff•□口子广福是心醒。，；：？−€")
 
 ERROR_TYPE_ORDER = [
-    "duplicate/tile overlap",
+    "Possible duplicate lines",
     "OCR token/phrase mismatch",
     "suspicious token",
     "suspicious glyph",
@@ -82,6 +82,15 @@ ERROR_TYPE_ORDER = [
 ]
 ERROR_TYPE_PRIORITY = {error_type: index for index, error_type in enumerate(ERROR_TYPE_ORDER)}
 PAGE_NUMBER_RE = re.compile(r"(\d+)$")
+
+
+def infer_detect_overlap(paddle_path: Path) -> bool:
+    joined = " ".join(part.lower() for part in paddle_path.parts)
+    if any(marker in joined for marker in ("notiles", "no-tiling", "no_tiling", "notiling")):
+        return False
+    if "tiling" in joined or "tile" in joined:
+        return True
+    return False
 
 
 def clean_snippet(value: str, limit: int = 170) -> str:
@@ -527,7 +536,7 @@ def add_known_structural_notes(
 
 def error_type_for_reason(reason: str) -> str:
     if reason.startswith("tile/overlap") or reason.startswith("possible duplicated/overlap"):
-        return "duplicate/tile overlap"
+        return "Possible duplicate lines"
     if reason.startswith("candidate OCR token mismatch") or reason.startswith(
         "localized OCR phrase divergence"
     ):
@@ -819,13 +828,17 @@ def analyze_pair(
     abbyy_path: Path,
     *,
     known_notes: bool = False,
+    detect_overlap: bool | None = None,
 ) -> dict[str, object]:
     paddle_text = paddle_path.read_text(errors="replace")
     abbyy_text = abbyy_path.read_text(errors="replace")
     paddle_lines = paddle_text.splitlines()
     abbyy_lines = abbyy_text.splitlines()
 
-    paddle_issues = line_level_issues(paddle_lines, detect_overlap=True)
+    if detect_overlap is None:
+        detect_overlap = infer_detect_overlap(paddle_path)
+
+    paddle_issues = line_level_issues(paddle_lines, detect_overlap=detect_overlap)
     abbyy_issues = line_level_issues(abbyy_lines, detect_overlap=False)
 
     if known_notes:
@@ -863,8 +876,14 @@ def generate_report(
     output_path: Path,
     *,
     known_notes: bool = False,
+    detect_overlap: bool | None = None,
 ) -> tuple[int, int]:
-    analysis = analyze_pair(paddle_path, abbyy_path, known_notes=known_notes)
+    analysis = analyze_pair(
+        paddle_path,
+        abbyy_path,
+        known_notes=known_notes,
+        detect_overlap=detect_overlap,
+    )
     paddle_records = list(analysis["paddle_records"])
     abbyy_records = list(analysis["abbyy_records"])
     write_csv(
@@ -882,8 +901,14 @@ def generate_report_rows(
     abbyy_path: Path,
     *,
     known_notes: bool = False,
+    detect_overlap: bool | None = None,
 ) -> dict[str, object]:
-    return analyze_pair(paddle_path, abbyy_path, known_notes=known_notes)
+    return analyze_pair(
+        paddle_path,
+        abbyy_path,
+        known_notes=known_notes,
+        detect_overlap=detect_overlap,
+    )
 
 
 def ocr_txt_files_in_dir(base_dir: Path) -> list[Path]:

@@ -263,7 +263,7 @@ Because of that, per-type totals can add up to more than the total number of art
 
 Below, each type is described in terms of what it means in this project, how the script recognizes it, and one representative example.
 
-### 1. Duplicate / Tile Overlap
+### 1. Possible duplicate lines
 
 Meaning:
 Content was repeated because tiled OCR regions overlapped or because adjacent lines were merged with partial duplication.
