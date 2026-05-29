@@ -110,29 +110,32 @@ Red bars mean Paddle had more tagged artifacts on that page, gray bars mean ABBY
 
 Some broad document-level patterns from the aggregate workbook:
 
-- `aeu.00037_19470820` is the noisiest document for both systems by total artifact count: Paddle `4,103`, ABBYY `4,106`
-- `oocihm.22250` has many pages but relatively low per-page artifact density; its main problem on both sides is separator/marker noise rather than heavy structural corruption. Paddle also runs high on coverage here: `111.2%` of ABBYY lines and `120.8%` of ABBYY words
-- `oocihm.N_00219_18600707` is notably harder for Paddle than ABBYY by total entries: Paddle `1,334`, ABBYY `942`. This document is close to line parity (`99.1%`) but still `110.2%` on words, which points to extra extracted fragments rather than obvious under-reading
-- `oocihm.N_00155_18880712` is notably harder for ABBYY than Paddle by total entries: Paddle `451`, ABBYY `865`. Paddle still emits more text here (`119.2%` lines, `109.3%` words), but ABBYY accumulates much more glyph and punctuation debris
-- `oocihm.N_00126_19130805` and `oocihm.N_00138_18940629` also lean toward Paddle on total artifact count, but for different reasons: one wins while recovering fewer lines, and the other lands near word-count parity while avoiding a large ABBYY glyph penalty
+- `aeu.00037_19470820` is the noisiest document for both systems by summed artifact entries. Paddle has the lower artifact count on `4` of the `8` pages, and ABBYY has the lower artifact count on the other `4`. The document-wide totals are `4,103` artifact entries for Paddle versus `4,106` artifact entries for ABBYY.
+- `oocihm.22250` has many pages but relatively low per-page artifact density; its main problem on both sides is separator/marker noise rather than heavy structural corruption. ABBYY has the lower artifact count on `94` pages, Paddle has the lower artifact count on `70`, and `13` pages are tied. The document-wide totals lean toward ABBYY: `2,204` artifact entries for Paddle versus `1,937` artifact entries for ABBYY. Paddle also runs high on coverage here: `111.2%` of ABBYY line count and `120.8%` of ABBYY word count.
+- `oocihm.N_00219_18600707` is notably harder for Paddle than ABBYY by summed artifact entries. ABBYY has the lower artifact count on all `4` pages, and the document-wide totals are `1,334` artifact entries for Paddle versus `942` artifact entries for ABBYY. This document is close to line parity (`99.1%` of ABBYY line count) but still `110.2%` of ABBYY word count, which points to extra extracted fragments rather than obvious under-reading.
+- `oocihm.N_00155_18880712` is notably harder for ABBYY than Paddle by summed artifact entries. Paddle has the lower artifact count on all `8` pages, and the document-wide totals are `451` artifact entries for Paddle versus `865` artifact entries for ABBYY. Paddle still emits more text here (`119.2%` of ABBYY line count and `109.3%` of ABBYY word count), but ABBYY accumulates much more glyph and punctuation debris.
+- `oocihm.N_00126_19130805` and `oocihm.N_00138_18940629` also lean toward Paddle on total artifact count, but for different reasons. In `oocihm.N_00126_19130805`, Paddle has the lower artifact count on `7` of the `8` pages and the document-wide totals are `808` artifact entries for Paddle versus `896` artifact entries for ABBYY, even while Paddle recovers fewer lines. In `oocihm.N_00138_18940629`, Paddle has the lower artifact count on `5` of the `8` pages and the document-wide totals are `1,302` artifact entries for Paddle versus `1,385` artifact entries for ABBYY, landing near word-count parity while avoiding a large ABBYY glyph penalty.
 
 ## Which Is Better?
 
 There is no clean single winner without human-transcribed ground truth. The safest conclusion is:
 
-- If `better` means `fewer tagged artifacts after OCR + cleanup`, Paddle has a narrow overall edge: `10,999` vs `11,052`
+- If `better` means `fewer tagged artifacts after OCR + cleanup`, Paddle has a narrow overall edge: `10,999` artifact entries for Paddle versus `11,052` artifact entries for ABBYY.
 - If `better` means `more aggressive text recovery`, Paddle is clearly ahead, producing `110.7%` of ABBYY's word count overall
+- If `better` means `total unique words captured`, `3x2` is the strongest Paddle variant in this dataset series. In the three-way comparison workbook anchored in the `4-...` dataset, `3x2` reaches `90.61%` ABBYY unique-token coverage, ahead of `3x1` at `90.19%` and no tiling at `82.15%`.
 - If `better` means `cleaner output on dense classified / notice pages full of separators and short ad fragments`, ABBYY often looks better
 - If `better` means `cleaner output on regular prose-heavy newspaper pages`, Paddle often looks better
 
 So the practical answer is conditional:
 
 - Paddle looks better as a coverage-oriented workflow when you are willing to post-clean extra debris
+- If the deciding metric is `maximum unique-word capture`, choose `3x2`
+- If the deciding metric is `best overall balance across the Paddle variants`, choose `3x1` instead
 - ABBYY looks safer on pages where the printed layout itself can fool tiling into preserving non-content fragments as text
 
 ### Where Paddle Looks Better
 
-`oocihm.N_00155_18880712` is the clearest document-level example. Paddle ends with `451` artifact entries versus `865` for ABBYY. On page `oocihm.N_00155_18880712.6`, Paddle has `41` artifact entries and ABBYY has `130`.
+`oocihm.N_00155_18880712` is the clearest document-level example. Paddle ends with `451` artifact entries for the document versus `865` artifact entries for ABBYY. On page `oocihm.N_00155_18880712.6`, Paddle has `41` artifact entries versus `130` artifact entries for ABBYY. Paddle word count is higher on that page too: `7,004` words for Paddle versus `6,358` words for ABBYY.
 
 ![Representative prose-heavy page where Paddle looks better](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
 
@@ -148,21 +151,21 @@ That is a good sign for Paddle when the goal is readable running text rather tha
 
 Additional examples from this dataset:
 
-`oocihm.N_00155_18750610.4`: Paddle `130` vs ABBYY `209`. This is another text-heavy multi-column page with little display ornament. Paddle still has more separator noise (`66` vs `18`), but ABBYY is much worse on `suspicious glyph` (`176` vs `33`). Workbook: [oocihm.N_00155_18750610.4.xlsx](test-results/page-level-excels/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.xlsx)
+`oocihm.N_00155_18750610.4`: Paddle has `130` artifact entries on this page versus `209` artifact entries for ABBYY. Paddle word count is higher: `16,746` words for Paddle versus `15,999` words for ABBYY. This is another text-heavy multi-column page with little display ornament. Paddle still has more separator noise (`66` vs `18`), but ABBYY is much worse on `suspicious glyph` (`176` vs `33`). Workbook: [oocihm.N_00155_18750610.4.xlsx](test-results/page-level-excels/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.xlsx)
 
 ![Additional Paddle-better example: oocihm.N_00155_18750610.4](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
 
-`oocihm.N_00155_18880712.3`: Paddle `35` vs ABBYY `94`. This is another prose-leaning page where ABBYY's glyph and punctuation debris dominate: `suspicious glyph` `67` vs `7`, `punctuation artifact` `14` vs `2`. Workbook: [oocihm.N_00155_18880712.3.xlsx](test-results/page-level-excels/oocihm.N_00155_18880712/oocihm.N_00155_18880712.3.xlsx)
+`oocihm.N_00155_18880712.3`: Paddle has `35` artifact entries on this page versus `94` artifact entries for ABBYY. Paddle word count is much higher: `7,659` words for Paddle versus `5,692` words for ABBYY. This is another prose-leaning page where ABBYY's glyph and punctuation debris dominate: `suspicious glyph` `67` vs `7`, `punctuation artifact` `14` vs `2`. Workbook: [oocihm.N_00155_18880712.3.xlsx](test-results/page-level-excels/oocihm.N_00155_18880712/oocihm.N_00155_18880712.3.xlsx)
 
 ![Additional Paddle-better example: oocihm.N_00155_18880712.3](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.3.jpg)
 
-`aeu.00037_19470820.7`: Paddle `912` vs ABBYY `1033`. Visually this is a grade-list page with tightly packed names plus article text at the bottom. It is noisy for both systems, but ABBYY's `punctuation artifact` count explodes (`575` vs `7`) and its glyph corruption is also higher (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
+`aeu.00037_19470820.7`: Paddle has `912` artifact entries on this page versus `1,033` artifact entries for ABBYY. Paddle word count is also slightly higher: `4,843` words for Paddle versus `4,534` words for ABBYY. Visually this is a grade-list page with tightly packed names plus article text at the bottom. It is noisy for both systems, but ABBYY's `punctuation artifact` count explodes (`575` vs `7`) and its glyph corruption is also higher (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
 
 ![Additional Paddle-better example: aeu.00037_19470820.7](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.7.jpg)
 
 ### Where ABBYY Looks Better
 
-`oocihm.N_00219_18600707` is the clearest case against Paddle. The worst page is `oocihm.N_00219_18600707.3`, where Paddle has `643` artifact entries and ABBYY has `408`.
+`oocihm.N_00219_18600707` is the clearest case against Paddle. The worst page is `oocihm.N_00219_18600707.3`, where Paddle has `643` artifact entries on this page versus `408` artifact entries for ABBYY. Paddle word count is higher there too: `5,241` words for Paddle versus `4,621` words for ABBYY.
 
 ![Representative classified-style page where ABBYY looks better](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
 
@@ -178,21 +181,21 @@ ABBYY is not clean on that page either, but Paddle's extra recovery turns into a
 
 Additional examples from this dataset:
 
-`oocihm.N_00138_18940629.5`: Paddle `313` vs ABBYY `159`. Visually this is a mixed page with article columns and large display ads. The main difference in the counts is separator-heavy extraction: `isolated marker/separator` `243` vs `86`. Workbook: [oocihm.N_00138_18940629.5.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.xlsx)
+`oocihm.N_00138_18940629.5`: Paddle has `313` artifact entries on this page versus `159` artifact entries for ABBYY. Paddle word count is also higher: `5,147` words for Paddle versus `4,921` words for ABBYY. Visually this is a mixed page with article columns and large display ads. The main difference in the counts is separator-heavy extraction: `isolated marker/separator` `243` vs `86`. Workbook: [oocihm.N_00138_18940629.5.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.xlsx)
 
 ![Additional ABBYY-better example: oocihm.N_00138_18940629.5](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.jpg)
 
-`oocihm.N_00219_18600707.4`: Paddle `249` vs ABBYY `171`. This is another mixed notice-and-ad page rather than a plain prose page. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because of much higher `isolated marker/separator` (`136` vs `37`) plus more token mismatches and suspicious tokens. Workbook: [oocihm.N_00219_18600707.4.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.4.xlsx)
+`oocihm.N_00219_18600707.4`: Paddle has `249` artifact entries on this page versus `171` artifact entries for ABBYY. Paddle word count is higher: `5,869` words for Paddle versus `5,486` words for ABBYY. This is another mixed notice-and-ad page rather than a plain prose page. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because of much higher `isolated marker/separator` (`136` vs `37`) plus more token mismatches and suspicious tokens. Workbook: [oocihm.N_00219_18600707.4.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.4.xlsx)
 
 ![Additional ABBYY-better example: oocihm.N_00219_18600707.4](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.4.jpg)
 
-`oocihm.22250.160`: Paddle `90` vs ABBYY `40`. This is not a classified page. It is a fee-schedule / tabular text page with many dot leaders and aligned amounts, and almost the entire gap is separator-like debris (`87` vs `34`) rather than glyph corruption. Workbook: [oocihm.22250.160.xlsx](test-results/page-level-excels/oocihm.22250/oocihm.22250.160.xlsx)
+`oocihm.22250.160`: Paddle has `90` artifact entries on this page versus `40` artifact entries for ABBYY. Paddle word count is higher here too: `318` words for Paddle versus `277` words for ABBYY. This is not a classified page. It is a fee-schedule / tabular text page with many dot leaders and aligned amounts, and almost the entire gap is separator-like debris (`87` vs `34`) rather than glyph corruption. Workbook: [oocihm.22250.160.xlsx](test-results/page-level-excels/oocihm.22250/oocihm.22250.160.xlsx)
 
 ![Additional ABBYY-better example: oocihm.22250.160](test-data/abbyy/oocihm.22250/0160.jpg)
 
 ### Mixed Case: Name Lists, Fine Print, and Ads
 
-`oocihm.N_00138_18940629.7` is a useful mixed example. The page combines dense name lists, small print, and boxed advertisements. Paddle finishes with `140` artifact entries versus `301` for ABBYY, even though Paddle still has more separator noise.
+`oocihm.N_00138_18940629.7` is a useful mixed example. The page combines dense name lists, small print, and boxed advertisements. Paddle finishes with `140` artifact entries on this page versus `301` artifact entries for ABBYY, even though Paddle still has more separator noise. Paddle word count is slightly lower: `4,041` words for Paddle versus `4,217` words for ABBYY.
 
 ![Representative mixed page with name lists, fine print, and ads](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
 
@@ -207,15 +210,15 @@ This shows the systems are not trading off the same failure type. Paddle often p
 
 Additional examples from this dataset:
 
-`oocihm.N_00138_18940629.8`: Paddle `217` vs ABBYY `248`. Paddle is still ahead overall, but not cleanly: it has more `isolated marker/separator` (`123` vs `78`), while ABBYY is worse on `suspicious glyph` (`97` vs `32`) and `punctuation artifact` (`57` vs `24`). Workbook: [oocihm.N_00138_18940629.8.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.8.xlsx)
+`oocihm.N_00138_18940629.8`: Paddle has `217` artifact entries on this page versus `248` artifact entries for ABBYY. Word count is essentially identical: `5,889` words for Paddle versus `5,878` words for ABBYY. Paddle is still ahead overall, but not cleanly: it has more `isolated marker/separator` (`123` vs `78`), while ABBYY is worse on `suspicious glyph` (`97` vs `32`) and `punctuation artifact` (`57` vs `24`). Workbook: [oocihm.N_00138_18940629.8.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.8.xlsx)
 
 ![Additional mixed-case example: oocihm.N_00138_18940629.8](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.8.jpg)
 
-`oocihm.N_00219_18600707.2`: Paddle `241` vs ABBYY `208`. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because its separator count is much higher (`180` vs `80`) and it introduces more OCR token mismatches (`14` vs `1`). Workbook: [oocihm.N_00219_18600707.2.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.2.xlsx)
+`oocihm.N_00219_18600707.2`: Paddle has `241` artifact entries on this page versus `208` artifact entries for ABBYY. Paddle word count is higher: `5,102` words for Paddle versus `4,552` words for ABBYY. ABBYY is worse on glyphs and punctuation, but Paddle still loses overall because its separator count is much higher (`180` vs `80`) and it introduces more OCR token mismatches (`14` vs `1`). Workbook: [oocihm.N_00219_18600707.2.xlsx](test-results/page-level-excels/oocihm.N_00219_18600707/oocihm.N_00219_18600707.2.xlsx)
 
 ![Additional mixed-case example: oocihm.N_00219_18600707.2](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.2.jpg)
 
-`aeu.00037_19470820.7`: Paddle `912` vs ABBYY `1033`. This is a good hybrid example because Paddle is much worse on separators (`643` vs `359`), but ABBYY is dramatically worse on punctuation (`575` vs `7`) and still worse on glyph corruption (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
+`aeu.00037_19470820.7`: Paddle has `912` artifact entries on this page versus `1,033` artifact entries for ABBYY. Paddle word count is also slightly higher: `4,843` words for Paddle versus `4,534` words for ABBYY. This is a good hybrid example because Paddle is much worse on separators (`643` vs `359`), but ABBYY is dramatically worse on punctuation (`575` vs `7`) and still worse on glyph corruption (`430` vs `245`). Workbook: [aeu.00037_19470820.7.xlsx](test-results/page-level-excels/aeu.00037_19470820/aeu.00037_19470820.7.xlsx)
 
 ![Additional mixed-case example: aeu.00037_19470820.7](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.7.jpg)
 
@@ -415,7 +418,8 @@ If the question is "which system fails in ways that are easier to clean up autom
 
 The current evidence favors a conditional recommendation rather than a blanket one:
 
-- For article text and readable prose extraction, prefer the tiled `3x2 + docparse + PaddleOCR + PaddleVL` workflow
+- If your priority is `maximum vocabulary capture`, prefer the tiled `3x2 + docparse + PaddleOCR + PaddleVL` workflow
+- If your priority is the `best-balanced default across the Paddle variants in this dataset series`, prefer `3x1 + docparse + PaddleOCR + PaddleVL` instead
 - For dense classifieds, notices, and pages where a lot of printed structure is not real body text, ABBYY still looks safer
 - If the Paddle workflow remains the default, the most valuable next cleanup target is separator/fragment suppression on classified-style pages
 

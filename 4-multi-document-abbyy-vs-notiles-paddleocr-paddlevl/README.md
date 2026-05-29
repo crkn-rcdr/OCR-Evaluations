@@ -184,6 +184,7 @@ So the practical answer is:
 - no tiling is the cleanest
 - `3x1` is still the best balanced
 - `3x2` is still the most expansive
+- if total unique words captured is the priority, `3x2` is the best choice: it has the highest ABBYY unique-token coverage at `90.61%`, ahead of `3x1` at `90.19%` and no tiling at `82.15%`
 
 ## Where No Tiling Looks Better
 
@@ -317,18 +318,51 @@ One important note about the merged artifact workbook:
 
 ## Recommendation
 
-The current ranking is:
+If the deciding metric is `total unique words captured` rather than overall balance, then the current ranking is:
 
-1. `3x1 + docparse + PaddleOCR + PaddleVL` as the best balanced Paddle workflow in this dataset series right now
-2. no tiling as the cleanest low-noise Paddle variant, useful when artifact suppression matters more than recall
-3. `3x2` as the high-expansion variant, useful when recall is worth materially higher cleanup cost
-4. ABBYY as the safer fallback on fee schedules, dot-leader layouts, narrow notices, and some ad-heavy pages
+1. `3x2 + docparse + PaddleOCR + PaddleVL` for maximum vocabulary capture
+2. `3x1 + docparse + PaddleOCR + PaddleVL` for the best balance of coverage and cleanup
+3. no tiling when low artifact count matters more than recall
+4. ABBYY as the safer fallback on the hardest structure-heavy layouts
 
 So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
 
 - much cleaner than the tiled runs
 - often dramatically cleaner than ABBYY on the right pages
 - but too coverage-light to displace `3x1` as the general default
+
+## Questions
+
+### Which Items Did Just Fine With No Tiling?
+
+The clearest document-level cases where no tiling did fine on word count are:
+
+- `aeu.00037_19470820`: no tiling has `31,327` words versus `31,512` for ABBYY. That is only `185` words lower, or `99.4%` of ABBYY's total word count.
+
+![Representative near-parity no-tiling page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
+
+- `oocihm.N_00126_19130805`: no tiling has `26,341` words versus `26,697` for ABBYY. That is only `356` words lower, or `98.7%` of ABBYY's total word count.
+
+![Representative near-parity no-tiling page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
+
+
+- `oocihm.N_00155_18880712`: no tiling has `49,845` words versus `48,928` for ABBYY. That is `917` words higher, or `101.9%` of ABBYY's total word count.
+
+![Representative slight-overshoot no-tiling page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
+
+The documents that do **not** look fine on total word count are:
+
+- `oocihm.N_00155_18750610`: no tiling has `27,236` words versus `59,913` for ABBYY. That is only `45.5%` of ABBYY's total word count, so this is a major under-recovery case.
+
+![Representative no-tiling under-recovery page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
+
+- `oocihm.N_00219_18600707`: no tiling has `25,715` words versus `19,407` for ABBYY. That is `6,308` words higher, or `132.5%` of ABBYY's total word count, so it is not close even though the artifact result was mixed.
+
+![Representative no-tiling mixed or over-expanded page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
+
+- `oocihm.22250`: no tiling has `101,397` words versus `74,316` for ABBYY. That is `27,081` words higher, or `136.4%` of ABBYY's total word count, making it the clearest no-tiling over-expansion case by word count.
+
+![Representative no-tiling over-expansion page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
 
 ## Regenerating The Results
 
