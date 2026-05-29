@@ -125,23 +125,6 @@ These outliers explain most of the aggregate gap. Red bars mean Paddle had more 
 
 ![Largest Page-Level Artifact Deltas](test-results/plots/png/page_artifact_delta.png)
 
-### 5. Three-Way ABBYY Token Coverage
-
-This is the most important cross-run chart. It shows why the no-tiling run is not the default recommendation even though its artifact total is best.
-
-![ABBYY Token Coverage by Document](test-results/plots/png/paddle_variants_abbyy_word_coverage.png)
-
-### 6. Three-Way Token Precision vs ABBYY
-
-This is where `3x1` separates from the other Paddle variants. It stays much closer to ABBYY vocabulary than `3x2`, while still covering much more than no tiling.
-
-![Token Precision vs ABBYY by Document](test-results/plots/png/paddle_variants_abbyy_word_precision.png)
-
-### 7. Three-Way Artifact Totals
-
-This chart is the cross-run summary: no tiling is cleanest, `3x1` is next, and `3x2` is the noisiest.
-
-![Paddle Variant Artifact Totals](test-results/plots/png/paddle_variants_artifact_totals.png)
 
 ## Document-Level Findings
 
