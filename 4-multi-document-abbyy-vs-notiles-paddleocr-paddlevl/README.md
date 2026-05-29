@@ -354,10 +354,10 @@ If the deciding metric is `total unique words captured`, the ranking is:
    Measured as `97,845` matched ABBYY unique tokens, `90.61%` ABBYY unique-token coverage, and `115,319` total unique tokens.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
    Measured as `97,388` matched ABBYY unique tokens, `90.19%` ABBYY unique-token coverage, and `110,017` total unique tokens.
-3. no tiling
-   Measured as `88,709` matched ABBYY unique tokens, `82.15%` ABBYY unique-token coverage, and `99,947` total unique tokens.
-4. ABBYY
+3. ABBYY
    Baseline only: `107,985` unique tokens and `100.00%` ABBYY unique-token coverage.
+4. no tiling
+   Measured as `88,709` matched ABBYY unique tokens, `82.15%` ABBYY unique-token coverage, and `99,947` total unique tokens.
 
 If the deciding metric is `best overall balance of word capture and artifact control`, the ranking is:
 
