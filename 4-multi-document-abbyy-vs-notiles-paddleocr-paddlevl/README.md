@@ -368,23 +368,35 @@ This is the canonical recommendation for the three Paddle variants plus ABBYY in
 If the deciding metric is `total unique words captured`, the ranking is:
 
 1. `3x2 + docparse + PaddleOCR + PaddleVL`
+   Measured as `97,845` matched ABBYY unique tokens, `90.61%` ABBYY unique-token coverage, and `115,319` total unique tokens.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
+   Measured as `97,388` matched ABBYY unique tokens, `90.19%` ABBYY unique-token coverage, and `110,017` total unique tokens.
 3. no tiling
+   Measured as `88,709` matched ABBYY unique tokens, `82.15%` ABBYY unique-token coverage, and `99,947` total unique tokens.
 4. ABBYY
+   Baseline only: `107,985` unique tokens and `100.00%` ABBYY unique-token coverage.
 
 If the deciding metric is `best overall balance of word capture and artifact control`, the ranking is:
 
 1. `3x1 + docparse + PaddleOCR + PaddleVL`
+   Measured as `90.19%` ABBYY unique-token coverage with `10,614` artifact entries.
 2. `3x2 + docparse + PaddleOCR + PaddleVL`
+   Measured as `90.61%` ABBYY unique-token coverage with `10,999` artifact entries.
 3. no tiling
+   Measured as `82.15%` ABBYY unique-token coverage with `7,874` artifact entries.
 4. ABBYY as the safer fallback on the hardest structure-heavy layouts
+   Canonical artifact baseline in the merged workbook: `11,041` artifact entries.
 
 If the deciding metric is `lowest artifact count`, the ranking is:
 
 1. no tiling
+   Measured as `7,874` artifact entries.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
+   Measured as `10,614` artifact entries.
 3. `3x2 + docparse + PaddleOCR + PaddleVL`
+   Measured as `10,999` artifact entries.
 4. ABBYY
+   Canonical merged-workbook baseline: `11,041` artifact entries.
 
 So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
 
