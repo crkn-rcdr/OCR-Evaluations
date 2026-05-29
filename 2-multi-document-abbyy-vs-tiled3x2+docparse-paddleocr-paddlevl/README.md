@@ -116,22 +116,6 @@ Some broad document-level patterns from the aggregate workbook:
 - `oocihm.N_00155_18880712` is notably harder for ABBYY than Paddle by summed artifact entries. Paddle has the lower artifact count on all `8` pages, and the document-wide totals are `451` artifact entries for Paddle versus `865` artifact entries for ABBYY. Paddle still emits more text here (`119.2%` of ABBYY line count and `109.3%` of ABBYY word count), but ABBYY accumulates much more glyph and punctuation debris.
 - `oocihm.N_00126_19130805` and `oocihm.N_00138_18940629` also lean toward Paddle on total artifact count, but for different reasons. In `oocihm.N_00126_19130805`, Paddle has the lower artifact count on `7` of the `8` pages and the document-wide totals are `808` artifact entries for Paddle versus `896` artifact entries for ABBYY, even while Paddle recovers fewer lines. In `oocihm.N_00138_18940629`, Paddle has the lower artifact count on `5` of the `8` pages and the document-wide totals are `1,302` artifact entries for Paddle versus `1,385` artifact entries for ABBYY, landing near word-count parity while avoiding a large ABBYY glyph penalty.
 
-## Which Is Better?
-
-There is no clean single winner without human-transcribed ground truth. The safest conclusion is:
-
-- If `better` means `fewer tagged artifacts after OCR + cleanup`, Paddle has a narrow overall edge: `10,999` artifact entries for Paddle versus `11,052` artifact entries for ABBYY.
-- If `better` means `more aggressive text recovery`, Paddle is clearly ahead, producing `110.7%` of ABBYY's word count overall
-- If `better` means `total unique words captured`, `3x2` is the strongest Paddle variant in this dataset series. In the three-way comparison workbook anchored in the `4-...` dataset, `3x2` reaches `90.61%` ABBYY unique-token coverage, ahead of `3x1` at `90.19%` and no tiling at `82.15%`.
-- If `better` means `cleaner output on dense classified / notice pages full of separators and short ad fragments`, ABBYY often looks better
-- If `better` means `cleaner output on regular prose-heavy newspaper pages`, Paddle often looks better
-
-So the practical answer is conditional:
-
-- Paddle looks better as a coverage-oriented workflow when you are willing to post-clean extra debris
-- If the deciding metric is `maximum unique-word capture`, choose `3x2`
-- If the deciding metric is `best overall balance across the Paddle variants`, choose `3x1` instead
-- ABBYY looks safer on pages where the printed layout itself can fool tiling into preserving non-content fragments as text
 
 ### Where Paddle Looks Better
 

@@ -169,88 +169,6 @@ So the practical answer is:
 - `3x2` is still the most expansive
 - if total unique words captured is the priority, `3x2` is the best choice: it has the highest ABBYY unique-token coverage at `90.61%`, ahead of `3x1` at `90.19%` and no tiling at `82.15%`
 
-## Where No Tiling Looks Better
-
-The strongest no-tiling pages are not just small clean wins. They are large-margin reductions in the exact categories where ABBYY breaks down badly.
-
-`aeu.00037_19470820.6`: no-tiling Paddle has `496` artifact entries on this page versus `1,024` artifact entries for ABBYY. Word count is much lower, though: no-tiling Paddle has `2,290` words versus `4,458` words for ABBYY. This is a dense results page full of names, scores, and short structured lines. Even here, removing tiling cuts the Paddle-side noise dramatically while ABBYY still collapses into punctuation and glyph debris, but this page is not a strong word-capture result for no tiling.
-
-![Representative dense results page where no tiling looks much better](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.6.jpg)
-
-Matching page-level workbook: [aeu.00037_19470820.6.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\aeu.00037_19470820\aeu.00037_19470820.6.xlsx)
-
-The main differences on that page are:
-
-- `suspicious glyph`: no tiling `131`, ABBYY `478`
-- `isolated marker/separator`: no tiling `363`, ABBYY `260`
-- `punctuation artifact`: no tiling `0`, ABBYY `780`
-
-That is the clearest example in this run of no tiling cleaning up the worst tiled-Paddle behavior without needing ABBYY's punctuation-heavy output style, but it is not a word-recovery win.
-
-`oocihm.N_00155_18750610.4`: no-tiling Paddle has `35` artifact entries on this page versus `209` artifact entries for ABBYY. Word count is much lower in no tiling: no-tiling Paddle has `7,202` words versus `15,999` words for ABBYY. This is a dense broadsheet text page with long article columns and minimal display furniture. It is one of the clearest cases where ABBYY's glyph corruption outweighs the residual Paddle artifacts on the artifact metric, but it is not a better page for word capture.
-
-![Representative text-heavy page where no tiling looks better](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
-
-Matching page-level workbook: [oocihm.N_00155_18750610.4.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\oocihm.N_00155_18750610\oocihm.N_00155_18750610.4.xlsx)
-
-The difference is driven mostly by:
-
-- `suspicious glyph`: no tiling `13`, ABBYY `176`
-- `isolated marker/separator`: no tiling `15`, ABBYY `18`
-- `line-start artifact`: no tiling `1`, ABBYY `9`
-
-`oocihm.N_00138_18940629.7`: no-tiling Paddle has `91` artifact entries on this page versus `301` artifact entries for ABBYY. Word count is much closer here: no-tiling Paddle has `3,810` words versus `4,218` words for ABBYY. This is still a mixed list-and-ad page, not an easy prose page, which makes it a useful counterexample to the idea that no tiling only wins on the simplest layouts.
-
-![Representative mixed list-and-ad page where no tiling still looks better](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
-
-Matching page-level workbook: [oocihm.N_00138_18940629.7.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\oocihm.N_00138_18940629\oocihm.N_00138_18940629.7.xlsx)
-
-## Where ABBYY Looks Better
-
-The strongest ABBYY pages are still the ones where printed structure is easy to preserve as fake text.
-
-`oocihm.22250.160`: no-tiling Paddle has `119` artifact entries on this page versus `40` artifact entries for ABBYY. Word count is actually slightly higher in no tiling: no-tiling Paddle has `305` words versus `277` words for ABBYY. This is a fee schedule with dot leaders and aligned amounts. So on raw word count, no tiling is ahead here; the reason ABBYY still looks better in this section is artifact burden, not lower recall.
-
-![Representative fee-schedule page where ABBYY looks better](test-data/abbyy/oocihm.22250/0160.jpg)
-
-Matching page-level workbook: [oocihm.22250.160.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\oocihm.22250\oocihm.22250.160.xlsx)
-
-The gap is almost entirely:
-
-- `isolated marker/separator`: no tiling `119`, ABBYY `34`
-
-`oocihm.N_00138_18940629.5`: no-tiling Paddle has `217` artifact entries on this page versus `158` artifact entries for ABBYY. Word count is nearly the same: no-tiling Paddle has `4,889` words versus `4,922` words for ABBYY. This page mixes article columns with large right-side display ads. No tiling is clearly better than the tiled runs here, but ABBYY is still safer overall on this page because the display structures are still being preserved as text.
-
-![Representative article-and-display-ad page where ABBYY still looks better](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.jpg)
-
-Matching page-level workbook: [oocihm.N_00138_18940629.5.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\oocihm.N_00138_18940629\oocihm.N_00138_18940629.5.xlsx)
-
-The key differences are:
-
-- `isolated marker/separator`: no tiling `163`, ABBYY `86`
-- `suspicious glyph`: no tiling `78`, ABBYY `39`
-- `punctuation artifact`: no tiling `2`, ABBYY `42`
-
-That page matters because it shows the limit of the no-tiling cleanup story: even after removing tiling, some ad-heavy layouts still look safer in ABBYY.
-
-## Mixed Case
-
-`oocihm.N_00219_18600707` is the clearest mixed document in the no-tiling run because the page-level result is evenly split: no-tiling Paddle has the lower artifact count on `2` of the `4` pages, and ABBYY has the lower artifact count on the other `2`. Even with that even page split, the document-wide total still leans slightly toward no tiling: `814` artifact entries for no-tiling Paddle versus `936` artifact entries for ABBYY.
-
-The best page for no tiling in that document is `oocihm.N_00219_18600707.3`: no-tiling Paddle has `232` artifact entries on this page versus `408` artifact entries for ABBYY. Word count is again much lower in no tiling: no-tiling Paddle has `3,179` words versus `4,622` words for ABBYY.
-
-![Representative classified-and-notice page with a mixed outcome](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
-
-Matching page-level workbook: [oocihm.N_00219_18600707.3.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\page-level-excels\oocihm.N_00219_18600707\oocihm.N_00219_18600707.3.xlsx)
-
-The interesting thing is that no tiling does not win there by eliminating all structure noise. It wins because ABBYY still carries much more punctuation and malformed-line-start debris, even while ABBYY also keeps substantially more text on the page:
-
-- `isolated marker/separator`: no tiling `160`, ABBYY `164`
-- `punctuation artifact`: no tiling `13`, ABBYY `162`
-- `line-start artifact`: no tiling `1`, ABBYY `21`
-
-So even on a hard classified-style page, no tiling can still look better if ABBYY's character-level output quality degrades enough, but on this specific page ABBYY still has the word-count edge.
-
 ## No Tiling vs 3x1 vs 3x2
 
 The cross-run comparison changes the recommendation.
@@ -346,7 +264,9 @@ There are no document-level examples in this dataset. Every document either:
 
 ## Recommendation
 
-This is the canonical recommendation for the three Paddle variants plus ABBYY in this dataset series.
+This is the canonical recommendation for the three Paddle variants in this dataset series.
+
+These rankings use ABBYY as the baseline reference at `107,985` unique tokens and `100.00%` ABBYY unique-token coverage.
 
 If the deciding metric is `total unique words captured`, the ranking is:
 
@@ -354,9 +274,7 @@ If the deciding metric is `total unique words captured`, the ranking is:
    Measured as `97,845` matched ABBYY unique tokens, `90.61%` ABBYY unique-token coverage, and `115,319` total unique tokens.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
    Measured as `97,388` matched ABBYY unique tokens, `90.19%` ABBYY unique-token coverage, and `110,017` total unique tokens.
-3. ABBYY
-   Baseline only: `107,985` unique tokens and `100.00%` ABBYY unique-token coverage.
-4. no tiling
+3. no tiling
    Measured as `88,709` matched ABBYY unique tokens, `82.15%` ABBYY unique-token coverage, and `99,947` total unique tokens.
 
 If the deciding metric is `best overall balance of word capture and artifact control`, the ranking is:
@@ -367,10 +285,11 @@ If the deciding metric is `best overall balance of word capture and artifact con
    Measured as `90.61%` ABBYY unique-token coverage with `10,999` artifact entries.
 3. no tiling
    Measured as `82.15%` ABBYY unique-token coverage with `7,874` artifact entries.
-4. ABBYY as the safer fallback on the hardest structure-heavy layouts
    Canonical artifact baseline in the merged workbook: `11,041` artifact entries.
 
 If the deciding metric is `lowest artifact count`, the ranking is:
+
+Using ABBYY as the merged-workbook baseline at `11,041` artifact entries:
 
 1. no tiling
    Measured as `7,874` artifact entries.
@@ -378,8 +297,6 @@ If the deciding metric is `lowest artifact count`, the ranking is:
    Measured as `10,614` artifact entries.
 3. `3x2 + docparse + PaddleOCR + PaddleVL`
    Measured as `10,999` artifact entries.
-4. ABBYY
-   Canonical merged-workbook baseline: `11,041` artifact entries.
 
 So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
 
