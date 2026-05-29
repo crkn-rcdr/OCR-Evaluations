@@ -280,7 +280,7 @@ By aggregate artifact count, the ordering is clear:
 
 ![Paddle Variant Artifact Totals](test-results/plots/png/paddle_variants_artifact_totals.png)
 
-Raw document word counts tell the complementary story: `3x2` is the highest-volume run, `3x1` is next, no tiling is lower, and ABBYY sits between the tiled and no-tiling variants depending on the document.
+Raw document word counts tell the complementary story: `3x2` is the highest-volume run on most documents, but no tiling is actually the top word-count run on `oocihm.22250` and `oocihm.N_00219_18600707`. ABBYY and `3x1` sit in the middle depending on the document.
 
 ![Paddle Variant Word Counts vs ABBYY](test-results/plots/png/paddle_variants_abbyy_word_counts.png)
 
@@ -320,26 +320,8 @@ One important note about the merged artifact workbook:
 - [paddle_variants_abbyy_artifacts.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\paddle_variants_abbyy_artifacts.xlsx) uses the no-tiling ABBYY pairing as the canonical ABBYY artifact baseline
 - that is intentional because the `ABBYY` mismatch-tag counts are pair-dependent, while the Paddle totals are the quantities being compared side by side
 
-## Recommendation
 
-If the deciding metric is `total unique words captured` rather than overall balance, then the current ranking is:
-
-1. `3x2 + docparse + PaddleOCR + PaddleVL` for maximum vocabulary capture
-2. `3x1 + docparse + PaddleOCR + PaddleVL` for the best balance of coverage and cleanup
-3. no tiling when low artifact count matters more than recall
-4. ABBYY as the safer fallback on the hardest structure-heavy layouts
-
-So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
-
-- much cleaner than the tiled runs
-- often dramatically cleaner than ABBYY on the right pages
-- but not the strongest overall word-capture option across the full dataset
-
-## Questions
-
-### Which Items Did Just Fine With No Tiling?
-
-This is cleaner as a four-way matrix using document-level totals.
+## Document Matrix
 
 ### Paddle More Words And Less Artifacts
 
@@ -378,6 +360,38 @@ There are no document-level examples in this dataset. Every document either:
 - gains words with more artifacts,
 - gains words with fewer artifacts, or
 - loses words while still reducing artifacts.
+
+## Recommendation
+
+This is the canonical recommendation for the three Paddle variants plus ABBYY in this dataset series.
+
+If the deciding metric is `total unique words captured`, the ranking is:
+
+1. `3x2 + docparse + PaddleOCR + PaddleVL`
+2. `3x1 + docparse + PaddleOCR + PaddleVL`
+3. no tiling
+4. ABBYY
+
+If the deciding metric is `best overall balance of word capture and artifact control`, the ranking is:
+
+1. `3x1 + docparse + PaddleOCR + PaddleVL`
+2. `3x2 + docparse + PaddleOCR + PaddleVL`
+3. no tiling
+4. ABBYY as the safer fallback on the hardest structure-heavy layouts
+
+If the deciding metric is `lowest artifact count`, the ranking is:
+
+1. no tiling
+2. `3x1 + docparse + PaddleOCR + PaddleVL`
+3. `3x2 + docparse + PaddleOCR + PaddleVL`
+4. ABBYY
+
+So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
+
+- much cleaner than the tiled runs
+- often dramatically cleaner than ABBYY on the right pages
+- strongest on raw cleanliness, but not the strongest overall word-capture option across the full dataset
+
 
 ## Regenerating The Results
 

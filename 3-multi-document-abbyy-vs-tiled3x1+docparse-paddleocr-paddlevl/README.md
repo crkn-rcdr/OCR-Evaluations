@@ -553,25 +553,8 @@ At the document level, the biggest extra-line gap is in `oocihm.22250`, where `3
 
 ![Largest Page-Level Extra-Line Deltas](test-results/plots/png/tiling_3x2_vs_3x1_page_extra_line_delta.png)
 
-### Recommendation
 
-If choosing between the two tiled workflows only:
-
-- Prefer `3x1 + docparse + PaddleOCR + PaddleVL` as the default candidate only if you want the best balance between word capture and artifact control. It is clearly better balanced than `3x2` on this dataset, both in the ABBYY comparison and in the direct `3x2` vs `3x1` line-diff workbook.
-- If the deciding metric is `total unique words captured`, choose `3x2` instead. In the three-way comparison workbook, `3x2` has the highest ABBYY unique-token coverage at `90.61%`, ahead of `3x1` at `90.19%`.
-- Treat `3x2` as the high-expansion variant. It adds far more unique-only lines than `3x1` on `200` of `217` pages, which is a strength if your goal is maximum recall, but it comes with materially higher cleanup risk.
-- Do not assume the extra `3x2` lines are automatically a benefit. Many may be useful recall, but the paired workbook shows that `3x2` is systematically producing much more line content than `3x1`, which is exactly the behavior that made it look noisier in the ABBYY comparison.
-- Keep ABBYY as the safer fallback for structure-heavy pages like classifieds, fee schedules, narrow notices, and dense ad pages, especially pages similar to `oocihm.N_00219_18600707.3`, `oocihm.N_00219_18600707.4`, and `oocihm.22250.160`.
-
-So the current ranking is:
-
-1. `3x1` as the best overall tiled workflow in this dataset right now
-2. `ABBYY` as the safer conservative option on the hardest structure-heavy pages
-3. `3x2` as the more expansive tiled variant, useful when recall is worth materially higher cleanup uncertainty
-
-## Questions
-
-### Document Matrix: ABBYY Vs 3x1
+### Document Matrix
 
 ### Paddle More Words And Less Artifacts
 
@@ -604,6 +587,8 @@ So the current ranking is:
 - `oocihm.22250`: `3x1` has `73,254` words versus `75,671` for ABBYY, a loss of `2,417` words. Artifact totals also lean toward ABBYY: `2,040` artifact entries for `3x1` versus `1,943` for ABBYY.
 
 ![Representative less-words more-artifacts page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
+
+Cross-run recommendation is consolidated in [4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\README.md). This section keeps the `3x1` vs ABBYY analysis and the direct `3x2` vs `3x1` comparison data, but the final workflow recommendation now lives in the no-tiling README so the dataset-series guidance stays in one place.
 
 ## Regenerating The Results
 
