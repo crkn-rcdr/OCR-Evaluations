@@ -195,7 +195,7 @@ Additional examples from this dataset:
 
 ### Mixed Case: Name Lists, Fine Print, and Ads
 
-`oocihm.N_00138_18940629.7` is a useful mixed example. The page combines dense name lists, small print, and boxed advertisements. Paddle finishes with `140` artifact entries on this page versus `301` artifact entries for ABBYY, even though Paddle still has more separator noise. Paddle word count is slightly lower: `4,041` words for Paddle versus `4,217` words for ABBYY.
+`oocihm.N_00138_18940629.7` is a useful mixed example. The page combines dense name lists, small print, and boxed advertisements. Paddle finishes with `140` artifact entries on this page versus `301` artifact entries for ABBYY, even though Paddle still has more separator noise. Paddle word count is slightly lower here, at `4,041` words versus `4,217` for ABBYY, so this is an artifact-quality win more than a maximum-word-capture win.
 
 ![Representative mixed page with name lists, fine print, and ads](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
 

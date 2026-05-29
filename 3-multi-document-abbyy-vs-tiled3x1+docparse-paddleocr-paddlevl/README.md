@@ -148,7 +148,7 @@ So the practical answer is conditional:
 
 ### Where Paddle Looks Better
 
-At the document level, `oocihm.N_00155_18880712` is still the clearest Paddle win. The biggest single-page Paddle advantage in the real `3x1` run is `oocihm.N_00138_18940629.7`: Paddle has `145` artifact entries on this page versus `301` artifact entries for ABBYY. Paddle word count is slightly lower: `4,061` words for Paddle versus `4,217` words for ABBYY.
+At the document level, `oocihm.N_00155_18880712` is still the clearest Paddle win. The biggest single-page Paddle advantage in the real `3x1` run is `oocihm.N_00138_18940629.7`: Paddle has `145` artifact entries on this page versus `301` artifact entries for ABBYY. Paddle word count is slightly lower there, at `4,061` words versus `4,217` for ABBYY, so this is an artifact-quality win more than a maximum-word-capture win.
 
 ![Representative mixed list-and-ad page where Paddle looks better](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
 
@@ -194,7 +194,7 @@ ABBYY is not clean on that page either, but Paddle's extra recovery turns into a
 
 Additional `3x1` examples from this dataset:
 
-`oocihm.N_00138_18940629.5`: Paddle has `353` artifact entries on this page versus `158` artifact entries for ABBYY. Paddle also overshoots ABBYY on word count: `5,208` words for Paddle versus `4,921` words for ABBYY. This page mixes article columns with large right-hand display ads. The `3x1` workflow over-preserves those ad structures very aggressively: `isolated marker/separator` `273` vs `86`, and Paddle also runs higher on `suspicious glyph` (`114` vs `39`). ABBYY is still worse on punctuation (`42` vs `14`), but that does not offset Paddle's separator load. Workbook: [oocihm.N_00138_18940629.5.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.xlsx)
+`oocihm.N_00138_18940629.5`: Paddle has `353` artifact entries on this page versus `158` artifact entries for ABBYY. Paddle word count is also higher: `5,208` words for Paddle versus `4,921` words for ABBYY. This page mixes article columns with large right-hand display ads. So on raw word count, Paddle is ahead; ABBYY still looks better here only because the `3x1` workflow preserves those ad structures so aggressively that the artifact burden stays much higher: `isolated marker/separator` `273` vs `86`, and Paddle also runs higher on `suspicious glyph` (`114` vs `39`). ABBYY is still worse on punctuation (`42` vs `14`), but that does not offset Paddle's separator load. Workbook: [oocihm.N_00138_18940629.5.xlsx](test-results/page-level-excels/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.xlsx)
 
 ![Additional ABBYY-better example: oocihm.N_00138_18940629.5](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.5.jpg)
 
@@ -497,7 +497,7 @@ There is now also a direct ABBYY word-coverage workbook in this folder:
 - workbook: `test-results/tiling_3x2_vs_3x1_abbyy_word_coverage.xlsx`
 - dashboard: `test-results/plots/tiling_3x2_vs_3x1_abbyy_word_coverage_dashboard.html`
 
-That workbook asks a different question than the artifact analysis: how much of ABBYY's page vocabulary each tiling run actually captures, and how much each run overshoots ABBYY.
+That workbook asks a different question than the artifact analysis: how much of ABBYY's page vocabulary each tiling run actually captures, and how far above or below ABBYY each run lands on raw page size.
 
 The coverage result is narrow but consistent in favor of `3x2`:
 
@@ -507,12 +507,12 @@ The coverage result is narrow but consistent in favor of `3x2`:
 
 ![ABBYY Token Coverage by Document](test-results/plots/png/tiling_3x2_vs_3x1_abbyy_word_coverage.png)
 
-But the precision result cuts the other way and explains why `3x2` still looks noisier overall:
+But the precision result cuts the other way and explains why `3x1` can still look cleaner overall on the artifact metric, even though `3x2` captures more words:
 
 - token precision vs ABBYY: `3x2 = 84.45%`, `3x1 = 90.56%`
 - pages closest to ABBYY word count: `3x2 = 24`, `3x1 = 165`, ties `7`
 
-So `3x2` captures slightly more of ABBYY's tokens, but `3x1` stays much closer to ABBYY's page size instead of overshooting it.
+So `3x2` captures slightly more of ABBYY's tokens, while `3x1` stays much closer to ABBYY's page size. If your priority is maximum word capture, that still favors `3x2`.
 
 ![Token Precision vs ABBYY by Document](test-results/plots/png/tiling_3x2_vs_3x1_abbyy_word_precision.png)
 
@@ -557,9 +557,9 @@ At the document level, the biggest extra-line gap is in `oocihm.22250`, where `3
 
 If choosing between the two tiled workflows only:
 
-- Prefer `3x1 + docparse + PaddleOCR + PaddleVL` as the default candidate. It is clearly better balanced than `3x2` on this dataset, both in the ABBYY comparison and in the direct `3x2` vs `3x1` line-diff workbook.
+- Prefer `3x1 + docparse + PaddleOCR + PaddleVL` as the default candidate only if you want the best balance between word capture and artifact control. It is clearly better balanced than `3x2` on this dataset, both in the ABBYY comparison and in the direct `3x2` vs `3x1` line-diff workbook.
 - If the deciding metric is `total unique words captured`, choose `3x2` instead. In the three-way comparison workbook, `3x2` has the highest ABBYY unique-token coverage at `90.61%`, ahead of `3x1` at `90.19%`.
-- Treat `3x2` as the high-expansion variant. It adds far more unique-only lines than `3x1` on `200` of `217` pages, so it should be chosen only when you intentionally want the more expansive pass and are prepared to absorb more cleanup risk.
+- Treat `3x2` as the high-expansion variant. It adds far more unique-only lines than `3x1` on `200` of `217` pages, which is a strength if your goal is maximum recall, but it comes with materially higher cleanup risk.
 - Do not assume the extra `3x2` lines are automatically a benefit. Many may be useful recall, but the paired workbook shows that `3x2` is systematically producing much more line content than `3x1`, which is exactly the behavior that made it look noisier in the ABBYY comparison.
 - Keep ABBYY as the safer fallback for structure-heavy pages like classifieds, fee schedules, narrow notices, and dense ad pages, especially pages similar to `oocihm.N_00219_18600707.3`, `oocihm.N_00219_18600707.4`, and `oocihm.22250.160`.
 
