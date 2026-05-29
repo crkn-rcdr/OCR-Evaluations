@@ -7,13 +7,6 @@ The repo contains both:
 - single-page and stress-test style experiments
 - multi-document comparisons across `3x2` tiling, `3x1` tiling, and no-tiling runs
 
-The dataset-specific analysis and recommendations live in the subfolder READMEs. This root README is the shared reference for:
-
-- repo structure
-- common OCR background
-- shared artifact-counting rules
-- shared error-type definitions
-
 ## Dataset Layout
 
 - [1-stress-test](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\1-stress-test)  
