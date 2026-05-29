@@ -150,8 +150,6 @@ There are no document-level examples in this dataset.
 
 There are no document-level examples in this dataset.
 
-Cross-run recommendation is consolidated in [4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\README.md). This README keeps the `3x2` vs ABBYY findings, but the final workflow ranking across `3x2`, `3x1`, no tiling, and ABBYY now lives in the no-tiling README so the dataset-series guidance stays in one place.
-
 ## Regenerating The Results
 
 Run:
