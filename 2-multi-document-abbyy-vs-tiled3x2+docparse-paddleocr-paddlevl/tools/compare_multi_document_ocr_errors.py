@@ -818,7 +818,7 @@ def detail_items_for_type(records: list[dict[str, object]], error_type: str) -> 
 def document_stats(path: Path, text: str, lines: list[str]) -> dict[str, int | str]:
     return {
         "path": str(path),
-        "lines": len(lines),
+        "lines": sum(1 for line in lines if line.strip()),
         "words": len(text.split()),
     }
 
@@ -830,8 +830,8 @@ def analyze_pair(
     known_notes: bool = False,
     detect_overlap: bool | None = None,
 ) -> dict[str, object]:
-    paddle_text = paddle_path.read_text(errors="replace")
-    abbyy_text = abbyy_path.read_text(errors="replace")
+    paddle_text = paddle_path.read_text(encoding="utf-8", errors="replace")
+    abbyy_text = abbyy_path.read_text(encoding="utf-8", errors="replace")
     paddle_lines = paddle_text.splitlines()
     abbyy_lines = abbyy_text.splitlines()
 

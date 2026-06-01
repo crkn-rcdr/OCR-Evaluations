@@ -47,10 +47,10 @@ The plots compare Paddle against ABBYY only; there is no human-transcribed refer
 
 Across all `217` page pairs:
 
-- Paddle line count: `66,567`
-- ABBYY line count: `66,166`
-- Paddle word count: `334,315`
-- ABBYY word count: `302,004`
+- Paddle nonblank line count: `66,567`
+- ABBYY nonblank line count: `49,775`
+- Paddle word count: `334,312`
+- ABBYY word count: `301,984`
 - Paddle artifact entries: `10,999`
 - ABBYY artifact entries: `11,052`
 

@@ -44,6 +44,7 @@ DEFAULT_OUTPUT = REPO_ROOT / "test-results" / "notiling_vs_3x1_extra_lines.xlsx"
 PAGE_NUMBER_RE = re.compile(r"(\d+)$")
 WORD_RE = re.compile(r"[A-Za-z0-9]+(?:[â€™'][A-Za-z0-9]+)?")
 LINE_TYPE_ORDER = ["separator/symbol", "short fragment", "text line"]
+ILLEGAL_EXCEL_CHAR_RE = re.compile(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]")
 
 
 @dataclass(frozen=True)
@@ -518,9 +519,15 @@ def write_workbook(
     for title, rows in sheets:
         worksheet = workbook.create_sheet(title=title)
         for row in rows:
-            worksheet.append(row)
+            worksheet.append([sanitize_excel_value(value) for value in row])
         format_sheet(worksheet)
     workbook.save(output_path)
+
+
+def sanitize_excel_value(value: object) -> object:
+    if isinstance(value, str):
+        return ILLEGAL_EXCEL_CHAR_RE.sub("", value)
+    return value
 
 
 def format_sheet(worksheet) -> None:

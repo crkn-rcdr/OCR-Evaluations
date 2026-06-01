@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate charts for the merged three-way Paddle artifact workbook."""
+"""Generate charts for a merged Paddle artifact workbook."""
 
 from __future__ import annotations
 
@@ -18,6 +18,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKBOOK = REPO_ROOT / "test-results" / "paddle_variants_abbyy_artifacts.xlsx"
 DEFAULT_OUTPUT_HTML = REPO_ROOT / "test-results" / "plots" / "paddle_variants_abbyy_artifacts_dashboard.html"
 DEFAULT_OUTPUT_PNG_DIR = REPO_ROOT / "test-results" / "plots" / "png"
+RUN_COLORS = ["#1982C4", "#55A630", "#BC4749", "#6A4C93", "#FF9F1C", "#2F4858"]
 
 
 @dataclass(frozen=True)
@@ -65,6 +66,18 @@ def main() -> None:
             "Document Artifact Totals",
             "Grouped artifact-entry totals for ABBYY and all three Paddle variants.",
             build_document_artifact_figure(documents, run_labels),
+        ),
+        (
+            "paddle_variants_line_counts",
+            "Document Line Counts",
+            "Absolute document nonblank line counts for ABBYY and all compared Paddle variants.",
+            build_document_count_figure(documents, run_labels, "lines", "Document nonblank line count"),
+        ),
+        (
+            "paddle_variants_word_counts",
+            "Document Word Counts",
+            "Absolute document word counts for ABBYY and all compared Paddle variants.",
+            build_document_count_figure(documents, run_labels, "words", "Document word count"),
         ),
         (
             "paddle_variants_line_recovery",
@@ -128,6 +141,8 @@ def load_workbook_data(path: Path) -> tuple[list[str], dict[str, tuple[str, ...]
         for label in run_labels:
             run_values[label] = {
                 "entries": parse_int(worksheet.cell(row, doc_index[f"{label} artifact entries"]).value),
+                "lines": parse_int(worksheet.cell(row, doc_index[f"{label} line count"]).value),
+                "words": parse_int(worksheet.cell(row, doc_index[f"{label} word count"]).value),
                 "line_recovery": parse_pct(worksheet.cell(row, doc_index[f"{label} line recovery %"]).value),
                 "word_recovery": parse_pct(worksheet.cell(row, doc_index[f"{label} word recovery %"]).value),
             }
@@ -171,11 +186,17 @@ def load_workbook_data(path: Path) -> tuple[list[str], dict[str, tuple[str, ...]
 
 def build_document_artifact_figure(rows: list[DocumentSummary], run_labels: list[str]) -> go.Figure:
     labels = [row.document for row in rows]
-    colors = {"ABBYY": "#6C757D", run_labels[0]: "#1982C4", run_labels[1]: "#55A630", run_labels[2]: "#BC4749"}
     figure = go.Figure()
-    figure.add_trace(go.Bar(name="ABBYY", x=labels, y=[row.abbyy_entries for row in rows], marker_color=colors["ABBYY"]))
-    for label in run_labels:
-        figure.add_trace(go.Bar(name=label, x=labels, y=[row.run_values[label]["entries"] for row in rows], marker_color=colors[label]))
+    figure.add_trace(go.Bar(name="ABBYY", x=labels, y=[row.abbyy_entries for row in rows], marker_color="#6C757D"))
+    for index, label in enumerate(run_labels):
+        figure.add_trace(
+            go.Bar(
+                name=label,
+                x=labels,
+                y=[row.run_values[label]["entries"] for row in rows],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
+            )
+        )
     figure.update_layout(
         barmode="group",
         yaxis_title="Artifact-entry count",
@@ -188,7 +209,6 @@ def build_document_artifact_figure(rows: list[DocumentSummary], run_labels: list
 
 def build_document_metric_figure(rows: list[DocumentSummary], run_labels: list[str], metric: str, yaxis_title: str) -> go.Figure:
     labels = [row.document for row in rows]
-    colors = ["#1982C4", "#55A630", "#BC4749"]
     figure = go.Figure()
     for index, label in enumerate(run_labels):
         figure.add_trace(
@@ -196,7 +216,38 @@ def build_document_metric_figure(rows: list[DocumentSummary], run_labels: list[s
                 name=label,
                 x=labels,
                 y=[row.run_values[label][metric] for row in rows],
-                marker_color=colors[index % len(colors)],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
+            )
+        )
+    figure.update_layout(
+        barmode="group",
+        yaxis_title=yaxis_title,
+        template="plotly_white",
+        margin=dict(l=60, r=30, t=50, b=110),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="left", x=0),
+    )
+    return figure
+
+
+def build_document_count_figure(rows: list[DocumentSummary], run_labels: list[str], metric: str, yaxis_title: str) -> go.Figure:
+    labels = [row.document for row in rows]
+    figure = go.Figure()
+    abbyy_metric = "abbyy_lines" if metric == "lines" else "abbyy_words"
+    figure.add_trace(
+        go.Bar(
+            name="ABBYY",
+            x=labels,
+            y=[getattr(row, abbyy_metric) for row in rows],
+            marker_color="#6C757D",
+        )
+    )
+    for index, label in enumerate(run_labels):
+        figure.add_trace(
+            go.Bar(
+                name=label,
+                x=labels,
+                y=[row.run_values[label][metric] for row in rows],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
             )
         )
     figure.update_layout(
@@ -216,7 +267,6 @@ def build_page_artifact_delta_figure(rows: list[PageSummary], run_labels: list[s
     ordered = sorted(rows, key=lambda page: (spread(page), page.document, page.page), reverse=True)[:20]
     labels = [page.label for page in ordered][::-1]
     figure = go.Figure()
-    colors = ["#1982C4", "#55A630", "#BC4749"]
     for index, label in enumerate(run_labels):
         figure.add_trace(
             go.Bar(
@@ -224,7 +274,7 @@ def build_page_artifact_delta_figure(rows: list[PageSummary], run_labels: list[s
                 x=[abs(int(page.run_values[label]["entry_delta"])) for page in ordered][::-1],
                 y=labels,
                 orientation="h",
-                marker_color=colors[index % len(colors)],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
                 hovertemplate=f"%{{y}}<br>{label} absolute artifact gap vs ABBYY: %{{x}}<extra></extra>",
             )
         )

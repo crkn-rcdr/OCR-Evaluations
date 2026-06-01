@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Merge the 3x2, 3x1, and no-tiling ABBYY artifact workbooks into one workbook."""
+"""Merge one or more ABBYY artifact workbooks into a combined comparison workbook."""
 
 from __future__ import annotations
 
@@ -33,6 +33,17 @@ DEFAULT_OUTPUT = REPO_ROOT / "test-results" / "paddle_variants_abbyy_artifacts.x
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--run-workbook",
+        dest="run_workbooks",
+        action="append",
+        metavar="LABEL=PATH",
+        help=(
+            "Custom labeled workbook input. Repeat for each run, for example "
+            "--run-workbook \"3x1 PaddleVL=C:\\path\\to\\workbook.xlsx\". "
+            "If omitted, the default 3x2 / 3x1 / no-tiling set is used."
+        ),
+    )
     parser.add_argument("--workbook-3x2", type=Path, default=RUN_WORKBOOKS[0][1])
     parser.add_argument("--workbook-3x1", type=Path, default=RUN_WORKBOOKS[1][1])
     parser.add_argument("--workbook-notiling", type=Path, default=RUN_WORKBOOKS[2][1])
@@ -40,13 +51,35 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def parse_run_workbook_specs(values: list[str] | None) -> list[tuple[str, Path]]:
+    if not values:
+        return []
+    run_inputs: list[tuple[str, Path]] = []
+    for value in values:
+        if "=" not in value:
+            raise ValueError(f"Invalid --run-workbook value '{value}'. Expected LABEL=PATH.")
+        label, raw_path = value.split("=", 1)
+        label = re.sub(r"\s+", " ", label).strip()
+        if not label:
+            raise ValueError(f"Invalid --run-workbook value '{value}'. Label must not be empty.")
+        path = Path(raw_path.strip())
+        if not str(path):
+            raise ValueError(f"Invalid --run-workbook value '{value}'. Path must not be empty.")
+        run_inputs.append((label, path))
+    return run_inputs
+
+
 def main() -> None:
     args = parse_args()
-    run_inputs = [
-        ("3x2", args.workbook_3x2.resolve()),
-        ("3x1", args.workbook_3x1.resolve()),
-        ("no tiling", args.workbook_notiling.resolve()),
-    ]
+    custom_inputs = parse_run_workbook_specs(args.run_workbooks)
+    if custom_inputs:
+        run_inputs = [(label, path.resolve()) for label, path in custom_inputs]
+    else:
+        run_inputs = [
+            ("3x2", args.workbook_3x2.resolve()),
+            ("3x1", args.workbook_3x1.resolve()),
+            ("no tiling", args.workbook_notiling.resolve()),
+        ]
     run_pages = {label: load_run_pages(path) for label, path in run_inputs}
     combined = combine_pages(run_pages)
     write_workbook(args.output.resolve(), build_overall_rows(combined, run_inputs))

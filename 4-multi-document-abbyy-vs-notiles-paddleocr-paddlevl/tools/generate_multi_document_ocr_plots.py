@@ -786,7 +786,7 @@ def read_text_stats(path: Path, cache: dict[Path, tuple[int, int]]) -> tuple[int
     if resolved in cache:
         return cache[resolved]
     text = resolved.read_text(encoding="utf-8", errors="replace")
-    stats = (len(text.splitlines()), len(text.split()))
+    stats = (sum(1 for line in text.splitlines() if line.strip()), len(text.split()))
     cache[resolved] = stats
     return stats
 

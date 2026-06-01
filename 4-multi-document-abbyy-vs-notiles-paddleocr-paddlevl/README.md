@@ -59,10 +59,10 @@ Cross-run dashboards:
 
 Across all `217` no-tiling vs ABBYY page pairs:
 
-- no-tiling Paddle line count: `55,721`
-- ABBYY line count: `66,166`
-- no-tiling Paddle word count: `299,607`
-- ABBYY word count: `302,004`
+- no-tiling Paddle nonblank line count: `55,721`
+- ABBYY nonblank line count: `49,775`
+- no-tiling Paddle word count: `299,604`
+- ABBYY word count: `301,984`
 - no-tiling Paddle artifact entries: `7,874`
 - ABBYY artifact entries: `11,041`
 
@@ -200,31 +200,31 @@ One important note about the merged artifact workbook:
 
 ### Paddle More Words And Less Artifacts
 
-- `oocihm.N_00219_18600707`: no tiling has `25,715` words versus `19,407` for ABBYY, a gain of `6,308` words. Artifact totals also favor no tiling: `814` artifact entries versus `936` for ABBYY.
+- `oocihm.N_00219_18600707`: no tiling has `25,831` words versus `19,479` for ABBYY, a gain of `6,352` words. Artifact totals also favor no tiling: `814` artifact entries versus `936` for ABBYY.
 
 ![Representative more-words less-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
 
-- `oocihm.N_00155_18880712`: no tiling has `49,845` words versus `48,928` for ABBYY, a gain of `917` words. Artifact totals also favor no tiling: `263` artifact entries versus `863` for ABBYY.
+- `oocihm.N_00155_18880712`: no tiling has `50,200` words versus `49,227` for ABBYY, a gain of `973` words. Artifact totals also favor no tiling: `263` artifact entries versus `863` for ABBYY.
 
 ![Representative more-words less-artifacts page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
 
 ### Paddle More Words And More Artifacts
 
-- `oocihm.22250`: no tiling has `101,397` words versus `74,316` for ABBYY, a gain of `27,081` words. Artifact totals cut the other way: `2,573` artifact entries for no tiling versus `1,926` for ABBYY.
+- `oocihm.22250`: no tiling has `102,132` words versus `75,684` for ABBYY, a gain of `26,448` words. Artifact totals cut the other way: `2,573` artifact entries for no tiling versus `1,926` for ABBYY.
 
 ![Representative more-words more-artifacts page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
 
 ### Paddle Less Words And Less Artifacts
 
-- `oocihm.N_00155_18750610`: no tiling has `27,236` words versus `59,913` for ABBYY, a loss of `32,677` words. Artifact totals still favor no tiling strongly: `198` artifact entries versus `920` for ABBYY.
+- `oocihm.N_00155_18750610`: no tiling has `27,204` words versus `59,393` for ABBYY, a loss of `32,189` words. Artifact totals still favor no tiling strongly: `198` artifact entries versus `920` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
 
-- `oocihm.N_00138_18940629`: no tiling has `36,798` words versus `40,383` for ABBYY, a loss of `3,585` words. Artifact totals still favor no tiling: `807` artifact entries versus `1,384` for ABBYY.
+- `oocihm.N_00138_18940629`: no tiling has `36,461` words versus `39,623` for ABBYY, a loss of `3,162` words. Artifact totals still favor no tiling: `807` artifact entries versus `1,384` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00138_18940629](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
 
-- `oocihm.N_00126_19130805`: no tiling has `26,341` words versus `26,697` for ABBYY, a loss of only `356` words. Artifact totals also favor no tiling: `551` artifact entries versus `898` for ABBYY.
+- `oocihm.N_00126_19130805`: no tiling has `26,438` words versus `26,529` for ABBYY, a loss of only `91` words. Artifact totals also favor no tiling: `551` artifact entries versus `898` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
 
@@ -240,25 +240,25 @@ There are no document-level examples in this dataset. Every document either:
 
 This is the canonical recommendation for the three Paddle variants in this dataset series.
 
-These rankings use ABBYY as the baseline reference at `107,985` unique tokens and `100.00%` ABBYY unique-token coverage.
+These rankings use ABBYY as the baseline reference at `301,984` raw words.
 
-If the deciding metric is `total unique words captured`, the ranking is:
+If the deciding metric is `raw total word count`, the ranking is:
 
 1. `3x2 + docparse + PaddleOCR + PaddleVL`
-   Measured as `97,845` matched ABBYY unique tokens, `90.61%` ABBYY unique-token coverage, and `115,319` total unique tokens.
+   Measured as `334,312` raw words.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
-   Measured as `97,388` matched ABBYY unique tokens, `90.19%` ABBYY unique-token coverage, and `110,017` total unique tokens.
+   Measured as `308,801` raw words.
 3. no tiling
-   Measured as `88,709` matched ABBYY unique tokens, `82.15%` ABBYY unique-token coverage, and `99,947` total unique tokens.
+   Measured as `299,604` raw words.
 
-If the deciding metric is `best overall balance of word capture and artifact control`, the ranking is:
+If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking is:
 
 1. `3x1 + docparse + PaddleOCR + PaddleVL`
-   Measured as `90.19%` ABBYY unique-token coverage with `10,614` artifact entries.
+   Measured as `308,801` raw words with `10,614` artifact entries.
 2. `3x2 + docparse + PaddleOCR + PaddleVL`
-   Measured as `90.61%` ABBYY unique-token coverage with `10,999` artifact entries.
+   Measured as `334,312` raw words with `10,999` artifact entries.
 3. no tiling
-   Measured as `82.15%` ABBYY unique-token coverage with `7,874` artifact entries.
+   Measured as `299,604` raw words with `7,874` artifact entries.
    Canonical artifact baseline in the merged workbook: `11,041` artifact entries.
 
 If the deciding metric is `lowest artifact count`, the ranking is:

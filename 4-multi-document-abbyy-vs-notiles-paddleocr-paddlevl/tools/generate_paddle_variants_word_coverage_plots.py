@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Generate charts for the three-way Paddle-vs-ABBYY word-coverage workbook."""
+"""Generate charts for a Paddle-vs-ABBYY word-coverage workbook."""
 
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_WORKBOOK = REPO_ROOT / "test-results" / "paddle_variants_abbyy_word_coverage.xlsx"
 DEFAULT_OUTPUT_HTML = REPO_ROOT / "test-results" / "plots" / "paddle_variants_abbyy_word_coverage_dashboard.html"
 DEFAULT_OUTPUT_PNG_DIR = REPO_ROOT / "test-results" / "plots" / "png"
+RUN_COLORS = ["#1982C4", "#55A630", "#BC4749", "#6A4C93", "#FF9F1C", "#2F4858"]
 
 
 @dataclass(frozen=True)
@@ -181,7 +182,6 @@ def build_document_metric_figure(
     metric: str,
     yaxis_title: str,
 ) -> go.Figure:
-    colors = ["#1982C4", "#55A630", "#BC4749"]
     labels = [row.document for row in rows]
     figure = go.Figure()
     for index, label in enumerate(run_labels):
@@ -190,7 +190,7 @@ def build_document_metric_figure(
                 name=label,
                 x=labels,
                 y=[row.run_values[label][metric] for row in rows],
-                marker_color=colors[index % len(colors)],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
             )
         )
     figure.update_layout(
@@ -204,12 +204,18 @@ def build_document_metric_figure(
 
 
 def build_document_word_count_figure(rows: list[DocumentSummary], run_labels: list[str]) -> go.Figure:
-    colors = {"ABBYY": "#6C757D", run_labels[0]: "#1982C4", run_labels[1]: "#55A630", run_labels[2]: "#BC4749"}
     labels = [row.document for row in rows]
     figure = go.Figure()
-    figure.add_trace(go.Bar(name="ABBYY", x=labels, y=[row.abbyy_words for row in rows], marker_color=colors["ABBYY"]))
-    for label in run_labels:
-        figure.add_trace(go.Bar(name=label, x=labels, y=[row.run_values[label]["words"] for row in rows], marker_color=colors[label]))
+    figure.add_trace(go.Bar(name="ABBYY", x=labels, y=[row.abbyy_words for row in rows], marker_color="#6C757D"))
+    for index, label in enumerate(run_labels):
+        figure.add_trace(
+            go.Bar(
+                name=label,
+                x=labels,
+                y=[row.run_values[label]["words"] for row in rows],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
+            )
+        )
     figure.update_layout(
         barmode="group",
         yaxis_title="Document word count",
@@ -228,7 +234,6 @@ def build_page_coverage_spread_figure(rows: list[PageSummary], run_labels: list[
     ordered = sorted(rows, key=lambda page: (spread(page), page.document, page.page), reverse=True)[:20]
     labels = [page.label for page in ordered][::-1]
     figure = go.Figure()
-    colors = ["#1982C4", "#55A630", "#BC4749"]
     for index, label in enumerate(run_labels):
         figure.add_trace(
             go.Bar(
@@ -236,7 +241,7 @@ def build_page_coverage_spread_figure(rows: list[PageSummary], run_labels: list[
                 x=[page.run_values[label]["coverage"] for page in ordered][::-1],
                 y=labels,
                 orientation="h",
-                marker_color=colors[index % len(colors)],
+                marker_color=RUN_COLORS[index % len(RUN_COLORS)],
                 hovertemplate=f"%{{y}}<br>{label} coverage: %{{x:.2f}}%<extra></extra>",
             )
         )
@@ -263,7 +268,6 @@ def build_page_word_distance_figure(rows: list[PageSummary], run_labels: list[st
         reverse=True,
     )
     ranks = list(range(1, len(ordered) + 1))
-    colors = ["#1982C4", "#55A630", "#BC4749"]
     figure = go.Figure()
     for index, label in enumerate(run_labels):
         figure.add_trace(
@@ -272,7 +276,7 @@ def build_page_word_distance_figure(rows: list[PageSummary], run_labels: list[st
                 x=ranks,
                 y=[abs(page.run_values[label]["word_delta"]) for page in ordered],
                 mode="lines+markers",
-                line=dict(color=colors[index % len(colors)], width=2),
+                line=dict(color=RUN_COLORS[index % len(RUN_COLORS)], width=2),
                 marker=dict(size=6),
                 customdata=[[page.label, page.abbyy_words, page.run_values[label]["words"]] for page in ordered],
                 hovertemplate=f"%{{customdata[0]}}<br>ABBYY words: %{{customdata[1]}}<br>{label} words: %{{customdata[2]}}<br>Absolute distance: %{{y}}<extra></extra>",

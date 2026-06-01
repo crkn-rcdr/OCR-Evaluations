@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare 3x2, 3x1, and no-tiling word coverage against ABBYY page by page."""
+"""Compare one or more OCR runs against ABBYY word coverage page by page."""
 
 from __future__ import annotations
 
@@ -44,6 +44,17 @@ WORD_RE = re.compile(r"[0-9A-Za-zÀ-ÖØ-öø-ÿ]+(?:['â€™][0-9A-Za-zÀ-Ö�
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--run",
+        dest="runs",
+        action="append",
+        metavar="LABEL=PATH",
+        help=(
+            "Custom run configuration. Repeat for each OCR run, for example "
+            "--run \"3x1 PaddleVL=C:\\path\\to\\run\". If omitted, the default "
+            "3x2 / 3x1 / no-tiling set is used."
+        ),
+    )
     parser.add_argument("--run-3x2-dir", type=Path, default=RUN_CONFIGS[0][1])
     parser.add_argument("--run-3x1-dir", type=Path, default=RUN_CONFIGS[1][1])
     parser.add_argument("--run-notiling-dir", type=Path, default=RUN_CONFIGS[2][1])
@@ -52,13 +63,35 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
+def parse_run_specs(values: list[str] | None) -> list[tuple[str, Path]]:
+    if not values:
+        return []
+    runs: list[tuple[str, Path]] = []
+    for value in values:
+        if "=" not in value:
+            raise ValueError(f"Invalid --run value '{value}'. Expected LABEL=PATH.")
+        label, raw_path = value.split("=", 1)
+        label = re.sub(r"\s+", " ", label).strip()
+        if not label:
+            raise ValueError(f"Invalid --run value '{value}'. Label must not be empty.")
+        path = Path(raw_path.strip())
+        if not str(path):
+            raise ValueError(f"Invalid --run value '{value}'. Path must not be empty.")
+        runs.append((label, path))
+    return runs
+
+
 def main() -> None:
     args = parse_args()
-    runs = [
-        ("3x2", args.run_3x2_dir.resolve()),
-        ("3x1", args.run_3x1_dir.resolve()),
-        ("no tiling", args.run_notiling_dir.resolve()),
-    ]
+    custom_runs = parse_run_specs(args.runs)
+    if custom_runs:
+        runs = [(label, path.resolve()) for label, path in custom_runs]
+    else:
+        runs = [
+            ("3x2", args.run_3x2_dir.resolve()),
+            ("3x1", args.run_3x1_dir.resolve()),
+            ("no tiling", args.run_notiling_dir.resolve()),
+        ]
     summaries, token_rows = compare_runs(runs, args.abbyy_dir.resolve())
     write_workbook(
         args.output.resolve(),
@@ -92,10 +125,10 @@ def normalize_token(token: str) -> str:
     return unicodedata.normalize("NFKC", token).replace("â€™", "'").casefold()
 
 
-def read_token_counter(path: Path) -> tuple[Counter[str], int]:
+def read_text_stats(path: Path) -> tuple[Counter[str], int, int]:
     text = path.read_text(encoding="utf-8", errors="replace")
     tokens = [normalize_token(token) for token in WORD_RE.findall(text)]
-    return Counter(tokens), len(tokens)
+    return Counter(tokens), len(tokens), len(text.split())
 
 
 def matched_token_count(left: Counter[str], right: Counter[str]) -> int:
@@ -158,32 +191,34 @@ def compare_runs(
             if missing_this_page:
                 continue
 
-            counter_abbyy, word_count_abbyy = read_token_counter(abbyy_path)
+            counter_abbyy, token_count_abbyy, raw_word_count_abbyy = read_text_stats(abbyy_path)
             page_summary: dict[str, object] = {
                 "document": anchor_doc_dir.name,
                 "page": anchor_path.name,
                 "abbyy_source_file": str(abbyy_path),
-                "abbyy_words": word_count_abbyy,
+                "abbyy_words": raw_word_count_abbyy,
+                "abbyy_token_count": token_count_abbyy,
                 "abbyy_unique_tokens": len(counter_abbyy),
             }
 
             for label, _run_dir in runs:
-                counter_run, word_count_run = read_token_counter(page_paths[label])
+                counter_run, token_count_run, raw_word_count_run = read_text_stats(page_paths[label])
                 matched_tokens = matched_token_count(counter_run, counter_abbyy)
                 matched_unique = matched_unique_count(counter_run, counter_abbyy)
                 missing_counter = counter_abbyy - counter_run
                 extra_counter = counter_run - counter_abbyy
                 page_summary[f"{label}_source_file"] = str(page_paths[label])
-                page_summary[f"{label}_words"] = word_count_run
+                page_summary[f"{label}_words"] = raw_word_count_run
+                page_summary[f"{label}_token_count"] = token_count_run
                 page_summary[f"{label}_unique_tokens"] = len(counter_run)
                 page_summary[f"{label}_matched_tokens"] = matched_tokens
                 page_summary[f"{label}_matched_unique"] = matched_unique
-                page_summary[f"{label}_coverage_pct"] = percentage(matched_tokens, word_count_abbyy)
+                page_summary[f"{label}_coverage_pct"] = percentage(matched_tokens, token_count_abbyy)
                 page_summary[f"{label}_unique_coverage_pct"] = percentage(matched_unique, len(counter_abbyy))
-                page_summary[f"{label}_precision_pct"] = percentage(matched_tokens, word_count_run)
-                page_summary[f"{label}_missing_tokens"] = word_count_abbyy - matched_tokens
-                page_summary[f"{label}_extra_tokens"] = word_count_run - matched_tokens
-                page_summary[f"{label}_word_delta"] = word_count_run - word_count_abbyy
+                page_summary[f"{label}_precision_pct"] = percentage(matched_tokens, token_count_run)
+                page_summary[f"{label}_missing_tokens"] = token_count_abbyy - matched_tokens
+                page_summary[f"{label}_extra_tokens"] = token_count_run - matched_tokens
+                page_summary[f"{label}_word_delta"] = raw_word_count_run - raw_word_count_abbyy
                 token_rows[label].extend(
                     build_token_rows(anchor_doc_dir.name, anchor_path.name, f"{label} missing vs ABBYY", missing_counter)
                 )
@@ -228,6 +263,7 @@ def build_overall_rows(
     totals: dict[str, dict[str, int]] = {
         label: {
             "words": 0,
+            "token_count": 0,
             "unique_tokens": 0,
             "matched_tokens": 0,
             "matched_unique": 0,
@@ -237,29 +273,37 @@ def build_overall_rows(
         for label in labels
     }
     total_abbyy_words = 0
+    total_abbyy_token_count = 0
     total_abbyy_unique = 0
-    doc_totals: dict[str, dict[str, object]] = defaultdict(lambda: {"page_count": 0, "abbyy_words": 0, "abbyy_unique_tokens": 0})
+    doc_totals: dict[str, dict[str, object]] = defaultdict(
+        lambda: {"page_count": 0, "abbyy_words": 0, "abbyy_token_count": 0, "abbyy_unique_tokens": 0}
+    )
 
     for summary in summaries:
         document = str(summary["document"])
         doc_bucket = doc_totals[document]
         doc_bucket["page_count"] = int(doc_bucket["page_count"]) + 1
         doc_bucket["abbyy_words"] = int(doc_bucket["abbyy_words"]) + int(summary["abbyy_words"])
+        doc_bucket["abbyy_token_count"] = int(doc_bucket["abbyy_token_count"]) + int(summary["abbyy_token_count"])
         doc_bucket["abbyy_unique_tokens"] = int(doc_bucket["abbyy_unique_tokens"]) + int(summary["abbyy_unique_tokens"])
         total_abbyy_words += int(summary["abbyy_words"])
+        total_abbyy_token_count += int(summary["abbyy_token_count"])
         total_abbyy_unique += int(summary["abbyy_unique_tokens"])
         for label in labels:
             totals[label]["words"] += int(summary[f"{label}_words"])
+            totals[label]["token_count"] += int(summary[f"{label}_token_count"])
             totals[label]["unique_tokens"] += int(summary[f"{label}_unique_tokens"])
             totals[label]["matched_tokens"] += int(summary[f"{label}_matched_tokens"])
             totals[label]["matched_unique"] += int(summary[f"{label}_matched_unique"])
             totals[label]["missing_tokens"] += int(summary[f"{label}_missing_tokens"])
             totals[label]["extra_tokens"] += int(summary[f"{label}_extra_tokens"])
             doc_bucket.setdefault(f"{label}_words", 0)
+            doc_bucket.setdefault(f"{label}_token_count", 0)
             doc_bucket.setdefault(f"{label}_matched_tokens", 0)
             doc_bucket.setdefault(f"{label}_missing_tokens", 0)
             doc_bucket.setdefault(f"{label}_extra_tokens", 0)
             doc_bucket[f"{label}_words"] = int(doc_bucket[f"{label}_words"]) + int(summary[f"{label}_words"])
+            doc_bucket[f"{label}_token_count"] = int(doc_bucket[f"{label}_token_count"]) + int(summary[f"{label}_token_count"])
             doc_bucket[f"{label}_matched_tokens"] = int(doc_bucket[f"{label}_matched_tokens"]) + int(summary[f"{label}_matched_tokens"])
             doc_bucket[f"{label}_missing_tokens"] = int(doc_bucket[f"{label}_missing_tokens"]) + int(summary[f"{label}_missing_tokens"])
             doc_bucket[f"{label}_extra_tokens"] = int(doc_bucket[f"{label}_extra_tokens"]) + int(summary[f"{label}_extra_tokens"])
@@ -294,11 +338,11 @@ def build_overall_rows(
         ["page count", *([len(summaries)] * len(labels)), len(summaries)],
         ["word count", *[totals[label]["words"] for label in labels], total_abbyy_words],
         ["unique token count", *[totals[label]["unique_tokens"] for label in labels], total_abbyy_unique],
-        ["matched ABBYY token occurrences", *[totals[label]["matched_tokens"] for label in labels], total_abbyy_words],
+        ["matched ABBYY token occurrences", *[totals[label]["matched_tokens"] for label in labels], total_abbyy_token_count],
         ["matched ABBYY unique tokens", *[totals[label]["matched_unique"] for label in labels], total_abbyy_unique],
-        ["coverage of ABBYY token occurrences", *[f"{percentage(totals[label]['matched_tokens'], total_abbyy_words):.2f}%" for label in labels], "100.00%"],
+        ["coverage of ABBYY token occurrences", *[f"{percentage(totals[label]['matched_tokens'], total_abbyy_token_count):.2f}%" for label in labels], "100.00%"],
         ["coverage of ABBYY unique tokens", *[f"{percentage(totals[label]['matched_unique'], total_abbyy_unique):.2f}%" for label in labels], "100.00%"],
-        ["token precision vs ABBYY", *[f"{percentage(totals[label]['matched_tokens'], totals[label]['words']):.2f}%" for label in labels], ""],
+        ["token precision vs ABBYY", *[f"{percentage(totals[label]['matched_tokens'], totals[label]['token_count']):.2f}%" for label in labels], ""],
         ["extra tokens vs ABBYY", *[totals[label]["extra_tokens"] for label in labels], 0],
         ["missing ABBYY tokens", *[totals[label]["missing_tokens"] for label in labels], 0],
         ["pages with best ABBYY token coverage", *[pages_best_coverage[label] for label in labels], pages_coverage_tied],
@@ -326,15 +370,17 @@ def build_overall_rows(
         bucket = doc_totals[document]
         row: list[object] = [document, int(bucket["page_count"])]
         abbyy_words = int(bucket["abbyy_words"])
+        abbyy_token_count = int(bucket["abbyy_token_count"])
         for label in labels:
             words = int(bucket[f"{label}_words"])
+            token_count = int(bucket[f"{label}_token_count"])
             matched_tokens = int(bucket[f"{label}_matched_tokens"])
             row.extend(
                 [
                     words,
                     matched_tokens,
-                    f"{percentage(matched_tokens, abbyy_words):.2f}%",
-                    f"{percentage(matched_tokens, words):.2f}%",
+                    f"{percentage(matched_tokens, abbyy_token_count):.2f}%",
+                    f"{percentage(matched_tokens, token_count):.2f}%",
                     int(bucket[f"{label}_missing_tokens"]),
                     int(bucket[f"{label}_extra_tokens"]),
                 ]
@@ -403,9 +449,23 @@ def build_token_sheet_rows(rows: list[dict[str, object]]) -> list[list[object]]:
     return output
 
 
-def safe_sheet_title(title: str) -> str:
-    cleaned = re.sub(r"[\[\]:*?/\\]", "_", title).strip()
-    return cleaned[:31] if len(cleaned) > 31 else cleaned
+def unique_sheet_title(title: str, used_names: set[str]) -> str:
+    cleaned = re.sub(r"[\[\]:*?/\\]", "_", title).strip() or "Sheet"
+    cleaned = cleaned[:31]
+    if cleaned not in used_names:
+        used_names.add(cleaned)
+        return cleaned
+
+    base = cleaned[:28].rstrip() or "Sheet"
+    counter = 2
+    while True:
+        candidate = f"{base}{counter}"
+        if len(candidate) > 31:
+            candidate = candidate[:31]
+        if candidate not in used_names:
+            used_names.add(candidate)
+            return candidate
+        counter += 1
 
 
 def write_workbook(
@@ -419,10 +479,11 @@ def write_workbook(
     workbook.create_sheet("Overall Summary")
     for row in overall_rows:
         workbook["Overall Summary"].append(row)
+    used_names = {"Overall Summary"}
     for label, rows in token_rows.items():
         for suffix, predicate in [("Missing vs ABBYY", "missing"), ("Extra vs ABBYY", "extra")]:
             filtered = [row for row in rows if predicate in str(row["category"]).casefold()]
-            sheet = workbook.create_sheet(safe_sheet_title(f"{label} {suffix}"))
+            sheet = workbook.create_sheet(unique_sheet_title(f"{label} {suffix}", used_names))
             for row in build_token_sheet_rows(filtered):
                 sheet.append(row)
     for sheet in workbook.worksheets:

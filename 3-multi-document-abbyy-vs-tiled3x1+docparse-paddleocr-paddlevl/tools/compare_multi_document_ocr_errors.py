@@ -82,6 +82,7 @@ ERROR_TYPE_ORDER = [
 ]
 ERROR_TYPE_PRIORITY = {error_type: index for index, error_type in enumerate(ERROR_TYPE_ORDER)}
 PAGE_NUMBER_RE = re.compile(r"(\d+)$")
+ILLEGAL_EXCEL_CHAR_RE = re.compile(r"[\x00-\x08\x0B-\x0C\x0E-\x1F]")
 
 
 def infer_detect_overlap(paddle_path: Path) -> bool:
@@ -597,11 +598,17 @@ def write_excel_workbook(
         )
         worksheet = workbook.create_sheet(title=title)
         for row in rows:
-            worksheet.append(row)
+            worksheet.append([sanitize_excel_value(value) for value in row])
 
         apply_excel_formatting(worksheet, template=template)
 
     workbook.save(output_path)
+
+
+def sanitize_excel_value(value: object) -> object:
+    if isinstance(value, str):
+        return ILLEGAL_EXCEL_CHAR_RE.sub("", value)
+    return value
 
 
 def apply_excel_formatting(
@@ -818,7 +825,7 @@ def detail_items_for_type(records: list[dict[str, object]], error_type: str) -> 
 def document_stats(path: Path, text: str, lines: list[str]) -> dict[str, int | str]:
     return {
         "path": str(path),
-        "lines": len(lines),
+        "lines": sum(1 for line in lines if line.strip()),
         "words": len(text.split()),
     }
 
@@ -830,8 +837,8 @@ def analyze_pair(
     known_notes: bool = False,
     detect_overlap: bool | None = None,
 ) -> dict[str, object]:
-    paddle_text = paddle_path.read_text(errors="replace")
-    abbyy_text = abbyy_path.read_text(errors="replace")
+    paddle_text = paddle_path.read_text(encoding="utf-8", errors="replace")
+    abbyy_text = abbyy_path.read_text(encoding="utf-8", errors="replace")
     paddle_lines = paddle_text.splitlines()
     abbyy_lines = abbyy_text.splitlines()
 
