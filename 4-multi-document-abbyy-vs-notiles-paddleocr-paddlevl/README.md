@@ -273,9 +273,9 @@ If the deciding metric is `best overall balance of raw word volume and artifact 
 However, 3x2 gains `25,511` raw words, and only adds `385` artifact entries. `3x2` is more uniformly expansive relative to ABBYY, so it never lands in the document-level `less words` buckets. 
 
 So the no-tiling run is a useful point on the tradeoff curve:
+- not the strongest overall word-capture option across the full dataset
 - much cleaner than the tiled runs
 - often cleaner than ABBYY on the right pages
-- strongest on raw cleanliness, but not the strongest overall word-capture option across the full dataset
 
 ## Regenerating The Results
 
