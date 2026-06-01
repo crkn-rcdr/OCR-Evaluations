@@ -242,6 +242,8 @@ This is the canonical recommendation for the three Paddle variants in this datas
 
 These rankings use ABBYY as the baseline reference at `301,984` raw words.
 
+The document-matrix difference between `3x2` and `3x1` does not overturn the cross-run recommendation. `3x2` is more uniformly expansive relative to ABBYY, so it never lands in the document-level `less words` buckets. `3x1` does, which is exactly why it can serve as the middle-ground option between `3x2`'s higher word volume and no tiling's lower artifact count.
+
 If the deciding metric is `raw total word count`, the ranking is:
 
 1. `3x2 + docparse + PaddleOCR + PaddleVL`
@@ -258,15 +260,15 @@ If the deciding metric is `best overall balance of raw word volume and artifact 
 2. `3x2 + docparse + PaddleOCR + PaddleVL`
    Measured as `334,312` raw words with `10,999` artifact entries.
 3. no tiling
-   Measured as `299,604` raw words with `7,874` artifact entries.
-   Canonical artifact baseline in the merged workbook: `11,041` artifact entries.
+   Measured as `299,604` raw words with `5,844` artifact entries.
+   Canonical artifact baseline in the merged workbook: `6,813` artifact entries.
 
 If the deciding metric is `lowest artifact count`, the ranking is:
 
-Using ABBYY as the merged-workbook baseline at `11,041` artifact entries:
+Using ABBYY as the merged-workbook baseline at `6,813` artifact entries:
 
 1. no tiling
-   Measured as `7,874` artifact entries.
+   Measured as `5,844` artifact entries.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
    Measured as `10,614` artifact entries.
 3. `3x2 + docparse + PaddleOCR + PaddleVL`

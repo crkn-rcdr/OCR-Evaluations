@@ -264,9 +264,9 @@ If the deciding metric is `raw total word count`, the ranking is:
 If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking is:
 
 1. `3x1 + docparse + PaddleOCR + PaddleVL`
-   Measured as `308,801` raw words with `10,614` artifact entries.
+   Measured as `308,801` raw words with `8,614` artifact entries.
 2. `3x1 + docparse + PaddleOCR + Chandra`
-   Measured as `308,593` raw words with `10,750` artifact entries.
+   Measured as `308,593` raw words with `8,829` artifact entries.
 
 So the practical recommendation is straightforward:
 
