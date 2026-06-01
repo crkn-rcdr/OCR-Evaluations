@@ -130,10 +130,10 @@ These outliers explain most of the aggregate gap. Red bars mean Paddle had more 
 
 The no-tiling run is extremely polarized by document:
 
-- `aeu.00037_19470820`: no-tiling Paddle has the lower artifact count than ABBYY on all `8` pages, while ABBYY is lower on `0`. The document-level artifact totals are `2,668` for no-tiling Paddle versus `4,114` for ABBYY. This is the clearest evidence that removing tiling can sharply reduce the punctuation-and-glyph collapse on dense results pages.
-- `oocihm.N_00126_19130805`: no-tiling Paddle is lower than ABBYY on all `8` pages, while ABBYY is lower on `0`. The document-level artifact totals are `551` for no-tiling Paddle versus `898` for ABBYY.
-- `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4` pages, while ABBYY is lower on `0`. The document-level artifact totals are `198` for no-tiling Paddle versus `920` for ABBYY.
-- `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8` pages, while ABBYY is lower on `0`. The document-level artifact totals are `263` for no-tiling Paddle versus `863` for ABBYY.
+- `aeu.00037_19470820`: no-tiling Paddle has the lower artifact count than ABBYY on all `8` pages. The document-level artifact totals are `2,668` for no-tiling Paddle versus `4,114` for ABBYY. This is the clearest evidence that removing tiling can sharply reduce the punctuation-and-glyph collapse on dense results pages.
+- `oocihm.N_00126_19130805`: no-tiling Paddle is lower than ABBYY on all `8` pages. The document-level artifact totals are `551` for no-tiling Paddle versus `898` for ABBYY.
+- `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4`. The document-level artifact totals are `198` for no-tiling Paddle versus `920` for ABBYY.
+- `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8`. The document-level artifact totals are `263` for no-tiling Paddle versus `863` for ABBYY.
 - `oocihm.N_00138_18940629`: no-tiling Paddle is lower than ABBYY on `7` pages, and ABBYY is lower on `1`. The document-level artifact totals are `807` for no-tiling Paddle versus `1,384` for ABBYY.
 - `oocihm.N_00219_18600707`: this one is genuinely mixed. No-tiling Paddle has the lower artifact count on `2` of the `4` pages, and ABBYY has the lower artifact count on the other `2` pages. Across the whole document, the summed artifact-entry totals still lean slightly toward no tiling: `814` artifact entries for no-tiling Paddle versus `936` artifact entries for ABBYY.
 - `oocihm.22250`: this is the hardest counterexample. ABBYY is lower on `106` pages, no-tiling Paddle is lower on only `57`, and `14` pages tie. The document-level artifact totals also lean toward ABBYY: `2,573` for no-tiling Paddle versus `1,926` for ABBYY. So this volume is the clearest case where the no-tiling cleanup gains are not enough to outweigh the pages where ABBYY stays structurally safer.
