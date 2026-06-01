@@ -49,43 +49,43 @@ Across all `217` page pairs:
 - ABBYY nonblank line count: `49,775`
 - Paddle word count: `308,801`
 - ABBYY word count: `301,984`
-- Paddle artifact entries: `10,614`
-- ABBYY artifact entries: `11,056`
+- Paddle artifact entries: `8,614`
+- ABBYY artifact entries: `6,829`
 
-Coverage ratios from the plots:
+Raw size ratios vs ABBYY:
 
-- Paddle line recovery vs ABBYY: `88.5%` overall
-- Paddle word recovery vs ABBYY: `102.3%` overall
+- Paddle nonblank lines vs ABBYY: `117.7%` overall
+- Paddle words vs ABBYY: `102.3%` overall
 
-Page-level split:
+Page-level artifact split:
 
-- Paddle lower on `111` pages
-- ABBYY lower on `91` pages
-- Tied on `15` pages
+- Paddle lower on `95` pages
+- ABBYY lower on `101` pages
+- Tied on `21` pages
 
-This is the real `3x1` result, and it is meaningfully different from the earlier duplicated `3x2` placeholder. Paddle now has both the lower total artifact count and the page-win edge, but the margin is coming from a very specific tradeoff:
+This is the real `3x1` result, and it is meaningfully different from the earlier duplicated `3x2` placeholder. In the current workbook, `3x1` does not beat ABBYY on the artifact metric. It recovers more raw text, but it also produces more tagged artifact rows:
 
-- Paddle recovers `6,800` more words than ABBYY
-- Paddle emits `7,586` fewer lines than ABBYY
-- Paddle still carries the much larger separator burden
-- ABBYY still carries the much larger glyph and punctuation burden
+- Paddle emits `6,817` more words than ABBYY
+- Paddle emits `8,805` more nonblank lines than ABBYY
+- Paddle produces `1,785` more artifact entries than ABBYY
+- The extra Paddle output is concentrated in separators, overlaps, and short-fragment structure rather than a clean artifact win
 
-So this `3x1` run no longer looks like a simple over-extraction pass. It looks more like a tighter extraction pass that often keeps usable text while collapsing some line structure and still over-preserving separators on hard layouts.
+So this `3x1` run looks more expansive than ABBYY on raw output size, but not cleaner on the tagged-artifact metric used in this dataset.
 
 The biggest pattern differences in `3x1` are still structural rather than cosmetic:
 
-- Paddle produces far more `isolated marker/separator` entries: `5,922` vs `2,962`
-- Paddle produces all detected `duplicate/tile overlap` entries: `102` vs `0`
-- ABBYY produces far more `suspicious glyph` entries: `6,017` vs `3,063`
-- ABBYY produces far more `punctuation artifact` entries: `2,386` vs `465`
-- ABBYY produces more `line-start artifact` entries: `298` vs `9`
+- Paddle produces far more `isolated marker/separator` entries: `6,317` vs `3,200`
+- Paddle produces all detected `duplicate/tile overlap` entries: `103` vs `0`
+- ABBYY produces more `punctuation artifact` entries: `2,401` vs `465`
+- ABBYY produces more `line-start artifact` entries: `429` vs `9`
+- ABBYY produces slightly more `suspicious glyph` entries: `804` vs `684`
 - `OCR token/phrase mismatch` and `suspicious token` counts are closer, with Paddle somewhat higher
 
 So the `3x1` workflow is not simply cleaner or dirtier. It fails differently:
 
-- Paddle is more likely to over-preserve separators, short layout fragments, and some duplication noise
-- ABBYY is more likely to collapse into glyph debris, punctuation debris, and malformed line starts
-- Paddle's aggregate edge comes mostly from avoiding ABBYY's character-level breakdown often enough to offset its own separator-heavy failures
+- Paddle is more likely to over-preserve separators, overlap noise, and short layout fragments
+- ABBYY is more likely to accumulate punctuation debris, malformed line starts, and BOM/control-character flags
+- On the current workbook, the total artifact burden still leans toward ABBYY as the cleaner side overall
 
 ## Key Charts
 
@@ -119,46 +119,47 @@ Red bars mean Paddle had more tagged artifacts on that page, gray bars mean ABBY
 
 ## 3x2 vs 3x1
 
-The `3x1` run looks better than the `3x2` run on the artifact metric used in this dataset.
+The `3x1` run still looks better than the `3x2` run on the artifact metric used in this dataset, even though neither tiled run beats ABBYY overall on total tagged artifact rows.
 
 Side-by-side, the main aggregate differences are:
 
-- `3x2` Paddle artifact entries: `10,999`
-- `3x1` Paddle artifact entries: `10,614`
-- `3x2` page wins vs ABBYY: Paddle `97`, ABBYY `107`, ties `13`
-- `3x1` page wins vs ABBYY: Paddle `111`, ABBYY `91`, ties `15`
-- `3x2` line recovery vs ABBYY: `100.6%`
-- `3x1` line recovery vs ABBYY: `88.5%`
-- `3x2` word recovery vs ABBYY: `110.7%`
-- `3x1` word recovery vs ABBYY: `102.3%`
+- `3x2` Paddle artifact entries: `8,779`
+- `3x1` Paddle artifact entries: `8,614`
+- `3x2` page wins vs ABBYY: Paddle `75`, ABBYY `114`, ties `28`
+- `3x1` page wins vs ABBYY: Paddle `95`, ABBYY `101`, ties `21`
+- `3x2` nonblank line count: `66,567`
+- `3x1` nonblank line count: `58,580`
+- `3x2` word count: `334,312`
+- `3x1` word count: `308,801`
 
-The high-level artifact and recovery picture still points the same way as the ABBYY comparison workbook: `3x1` is the better-balanced workflow, while `3x2` is the more expansive one.
+The high-level artifact and output-size picture still points the same way as the comparison workbooks: `3x1` is the better-balanced workflow, while `3x2` is the more expansive one.
 
 ![Document Artifact Totals](test-results/plots/png/document_artifact_totals.png)
 
 That means the `3x2` workflow is the more aggressive extractor, while `3x1` is the tighter one:
 
-- `3x2` emits about `25,511` more words than ABBYY
-- `3x1` emits about `6,800` more words than ABBYY
-- `3x2` stays near ABBYY on line count
-- `3x1` emits far fewer lines than ABBYY
+- `3x2` emits about `32,328` more words than ABBYY
+- `3x1` emits about `6,817` more words than ABBYY
+- `3x2` emits about `16,792` more nonblank lines than ABBYY
+- `3x1` emits about `8,805` more nonblank lines than ABBYY
 
 The artifact mix also moved in the right direction with `3x1`:
 
-- `isolated marker/separator`: `6,034` in `3x2` down to `5,922` in `3x1`
-- `suspicious glyph`: `3,316` down to `3,063`
+- `isolated marker/separator`: `6,417` in `3x2` down to `6,317` in `3x1`
+- `suspicious glyph`: `729` down to `684`
 - `punctuation artifact`: `520` down to `465`
-- `line-start artifact`: `15` down to `9`
+- `line-start artifact`: `14` down to `9`
 - `abbreviation/spacing`: `261` down to `241`
+- `duplicate/tile overlap`: `108` down to `103`
 
 Not every category improved:
 
-- `OCR token/phrase mismatch`: `345` in `3x2` up to `385` in `3x1`
+- `OCR token/phrase mismatch`: `358` in `3x2` up to `383` in `3x1`
 - `suspicious token`: `1,077` up to `1,086`
 
 But those increases are smaller than the gains in the categories that most often made the `3x2` run look over-extracted.
 
-The biggest practical shift is in `oocihm.22250`, where `3x2` lost to ABBYY by page count (`70` Paddle wins vs `94` ABBYY wins) but `3x1` flips that to a narrow Paddle edge (`83` vs `79`, with `15` ties). `oocihm.N_00155_18750610` also improves from a `3` to `1` page split in `3x2` to a clean `4` to `0` Paddle sweep in `3x1`. The main hard case does not change: `oocihm.N_00219_18600707` is still an ABBYY sweep in both tiling variants.
+The biggest practical shift is in `oocihm.22250`, where `3x2` loses by page count (`65` Paddle wins vs `84` ABBYY wins, with `28` ties) but `3x1` flips that to a Paddle edge (`87` vs `71`, with `19` ties). The hardest cases do not change: `oocihm.N_00155_18750610` and `oocihm.N_00219_18600707` are still ABBYY sweeps in both tiling variants.
 
 There is now also a direct ABBYY word-coverage workbook in this folder:
 
@@ -169,16 +170,16 @@ That workbook asks a different question than the artifact analysis: how much of 
 
 The coverage result is narrow but consistent in favor of `3x2`:
 
-- overall ABBYY token-occurrence coverage: `3x2 = 93.80%`, `3x1 = 92.98%`
-- overall ABBYY unique-token coverage: `3x2 = 90.61%`, `3x1 = 90.19%`
-- pages with better ABBYY token coverage: `3x2 = 156`, `3x1 = 14`, ties `24`
+- overall ABBYY token-occurrence coverage: `3x2 = 94.15%`, `3x1 = 93.37%`
+- overall ABBYY unique-token coverage: `3x2 = 90.84%`, `3x1 = 90.45%`
+- pages with better ABBYY token coverage: `3x2 = 182`, `3x1 = 23`, ties `12`
 
 ![ABBYY Token Coverage by Document](test-results/plots/png/tiling_3x2_vs_3x1_abbyy_word_coverage.png)
 
 But the precision result cuts the other way and explains why `3x1` can still look cleaner overall on the artifact metric, even though `3x2` captures more words:
 
-- token precision vs ABBYY: `3x2 = 84.45%`, `3x1 = 90.56%`
-- pages closest to ABBYY word count: `3x2 = 24`, `3x1 = 165`, ties `7`
+- token precision vs ABBYY: `3x2 = 84.52%`, `3x1 = 90.69%`
+- pages closest to ABBYY word count: `3x2 = 25`, `3x1 = 186`, ties `6`
 
 So `3x2` captures slightly more of ABBYY's tokens, while `3x1` stays much closer to ABBYY's page size. If your priority is maximum word capture, that still favors `3x2`.
 
@@ -225,45 +226,51 @@ At the document level, the biggest extra-line gap is in `oocihm.22250`, where `3
 
 Some broad document-level patterns from the aggregate workbook and refreshed plots:
 
-- `aeu.00037_19470820` is still the noisiest document on both sides and remains close overall. Paddle has the lower artifact count on `4` of the `8` pages, and ABBYY has the lower artifact count on the other `4`. The document-wide totals are `4,022` artifact entries for Paddle versus `4,107` artifact entries for ABBYY. It is still the best example of the separator-vs-punctuation tradeoff.
-- `oocihm.22250` is the biggest volume test in the set and stays genuinely mixed. Paddle has the lower artifact count on `83` pages, ABBYY has the lower artifact count on `79`, and `15` pages are tied. Even so, the document-wide totals still lean slightly toward ABBYY: `2,040` artifact entries for Paddle versus `1,943` artifact entries for ABBYY. Coverage is below ABBYY here at `81.0%` of ABBYY line count and `96.8%` of ABBYY word count, which suggests `3x1` is often suppressing short fragments but not clearly beating ABBYY on this whole volume.
-- `oocihm.N_00219_18600707` is still the strongest document-level ABBYY win by summed artifact entries. ABBYY has the lower artifact count on all `4` pages, and the document-wide totals are `1,266` artifact entries for Paddle versus `939` artifact entries for ABBYY. Paddle word recovery is still above ABBYY (`107.2%` of ABBYY word count) even though Paddle line recovery is below (`94.2%` of ABBYY line count), which points to extra fragment extraction on the hardest ad-heavy pages.
-- `oocihm.N_00155_18880712` remains the strongest Paddle win. Paddle has the lower artifact count on all `8` pages, and the document-wide totals are `443` artifact entries for Paddle versus `863` artifact entries for ABBYY. This is the clearest prose-led case where ABBYY's glyph and punctuation corruption outweigh Paddle's separator noise.
-- `oocihm.N_00126_19130805` is one of the strongest clean Paddle wins. Paddle has the lower artifact count on `7` of the `8` pages, while ABBYY is lower on `1`. The document-wide totals are `731` artifact entries for Paddle versus `897` artifact entries for ABBYY. Paddle reaches only `76.4%` of ABBYY line count here but still slightly exceeds ABBYY on words (`100.6%` of ABBYY word count), which suggests fewer short stray lines rather than obvious text loss.
-- `oocihm.N_00138_18940629` remains the best mixed-layout stress case in the set. Paddle has the lower artifact count on `5` of the `8` pages, and ABBYY is lower on `3`. The document-wide totals are nearly even: `1,354` artifact entries for Paddle versus `1,386` artifact entries for ABBYY. It still contains both the biggest single-page Paddle win and one of the biggest ABBYY wins.
-- `oocihm.N_00155_18750610` is now a clean Paddle sweep by page count. Paddle has the lower artifact count on all `4` pages, and the document-wide totals are `758` artifact entries for Paddle versus `921` artifact entries for ABBYY. That is a strong result because it is driven by dense article pages, not just the easiest prose pages.
+- `aeu.00037_19470820` is still one of the noisiest documents in the set, but the current workbook now leans toward ABBYY. ABBYY has the lower artifact count on `6` of the `8` pages, and the document totals are `2,379` artifact entries for Paddle versus `2,123` for ABBYY, even though Paddle emits `3,410` more words.
+- `oocihm.22250` is the biggest volume test and the main place where `3x1` improves materially over `3x2`. On the current workbook, Paddle has the lower artifact count on `87` pages, ABBYY is lower on `71`, and `19` pages are tied. Even so, the document totals still lean toward ABBYY: `1,852` artifact entries for Paddle versus `1,774` for ABBYY, and Paddle is also below ABBYY on raw words (`73,254` versus `75,684`).
+- `oocihm.N_00219_18600707` remains the strongest document-level ABBYY win by total artifact entries. ABBYY has the lower artifact count on all `4` pages, and the document totals are `1,261` artifact entries for Paddle versus `740` for ABBYY. Paddle still emits `1,399` more words here, which suggests the extra output is not buying a cleaner page.
+- `oocihm.N_00155_18880712` is still the best current `3x1` case. Total artifact entries are slightly lower for Paddle (`412` versus `425`), the page split is even at `4` to `4`, and Paddle emits `4,508` more words than ABBYY.
+- `oocihm.N_00126_19130805` is now a close but ABBYY-leaning result. ABBYY has the lower artifact count on `5` pages, Paddle is lower on `2`, and `1` page is tied. Totals are `697` artifact entries for Paddle versus `661` for ABBYY, while raw word counts are almost identical (`26,681` versus `26,529`).
+- `oocihm.N_00138_18940629` is now a clear ABBYY artifact win. ABBYY has the lower artifact count on `7` of the `8` pages, with `1` tie, and the document totals are `1,322` artifact entries for Paddle versus `750` for ABBYY, even though the raw word counts are nearly the same.
+- `oocihm.N_00155_18750610` is also a clear ABBYY win in the current workbook. ABBYY has the lower artifact count on all `4` pages, and the document totals are `691` artifact entries for Paddle versus `356` for ABBYY, while Paddle is slightly lower on raw word count as well.
 
 ### Document Matrix
 
 #### Paddle More Words And Less Artifacts
 
-- `oocihm.N_00155_18880712`: `3x1` has `53,735` words versus `49,224` for ABBYY, a gain of `4,511` words. Artifact totals also favor `3x1`: `443` artifact entries versus `863` for ABBYY.
+- `oocihm.N_00155_18880712`: `3x1` has `53,735` words versus `49,227` for ABBYY, a gain of `4,508` words. Artifact totals also favor `3x1`: `412` artifact entries versus `425` for ABBYY.
 
 ![Representative more-words less-artifacts page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
 
-- `aeu.00037_19470820`: `3x1` has `35,459` words versus `32,046` for ABBYY, a gain of `3,413` words. Artifact totals also favor `3x1`: `4,022` artifact entries versus `4,107` for ABBYY.
-
-![Representative more-words less-artifacts page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
-
-- `oocihm.N_00126_19130805`: `3x1` has `26,681` words versus `26,523` for ABBYY, a gain of `158` words. Artifact totals also favor `3x1`: `731` artifact entries versus `897` for ABBYY.
-
-![Representative more-words less-artifacts page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
-
 #### Paddle More Words And More Artifacts
 
-- `oocihm.N_00219_18600707`: `3x1` has `20,878` words versus `19,477` for ABBYY, a gain of `1,401` words. Artifact totals cut the other way: `1,266` artifact entries for `3x1` versus `939` for ABBYY.
+- `aeu.00037_19470820`: `3x1` has `35,459` words versus `32,049` for ABBYY, a gain of `3,410` words. Artifact totals cut the other way: `2,379` artifact entries for `3x1` versus `2,123` for ABBYY.
+
+![Representative more-words more-artifacts page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
+
+- `oocihm.N_00126_19130805`: `3x1` has `26,681` words versus `26,529` for ABBYY, a gain of `152` words. Artifact totals cut the other way: `697` artifact entries for `3x1` versus `661` for ABBYY.
+
+![Representative more-words more-artifacts page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
+
+- `oocihm.N_00138_18940629`: `3x1` has `39,731` words versus `39,623` for ABBYY, a gain of `108` words. Artifact totals cut the other way: `1,322` artifact entries for `3x1` versus `750` for ABBYY.
+
+![Representative more-words more-artifacts page from oocihm.N_00138_18940629](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.1.jpg)
+
+- `oocihm.N_00219_18600707`: `3x1` has `20,878` words versus `19,479` for ABBYY, a gain of `1,399` words. Artifact totals cut the other way: `1,261` artifact entries for `3x1` versus `740` for ABBYY.
 
 ![Representative more-words more-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
 
 #### Paddle Less Words And Less Artifacts
 
-- `oocihm.N_00155_18750610`: `3x1` has `59,063` words versus `59,391` for ABBYY, a loss of `328` words. Artifact totals still favor `3x1`: `758` artifact entries versus `921` for ABBYY.
-
-![Representative less-words less-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
+There are no current `3x1` document groups in this quadrant.
 
 #### Paddle Less Words And More Artifacts
 
-- `oocihm.22250`: `3x1` has `73,254` words versus `75,671` for ABBYY, a loss of `2,417` words. Artifact totals also lean toward ABBYY: `2,040` artifact entries for `3x1` versus `1,943` for ABBYY.
+- `oocihm.N_00155_18750610`: `3x1` has `59,063` words versus `59,393` for ABBYY, a loss of `330` words. Artifact totals also lean toward ABBYY: `691` artifact entries for `3x1` versus `356` for ABBYY.
+
+![Representative less-words more-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
+
+- `oocihm.22250`: `3x1` has `73,254` words versus `75,684` for ABBYY, a loss of `2,430` words. Artifact totals also lean toward ABBYY: `1,852` artifact entries for `3x1` versus `1,774` for ABBYY.
 
 ![Representative less-words more-artifacts page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
 
