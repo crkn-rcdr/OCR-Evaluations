@@ -63,7 +63,7 @@ Page-level artifact split:
 - ABBYY lower on `101` pages
 - Tied on `21` pages
 
-This is the real `3x1` result, and it is meaningfully different from the earlier duplicated `3x2` placeholder. In the current workbook, `3x1` does not beat ABBYY on the artifact metric. It recovers more raw text, but it also produces more tagged artifact rows:
+In the current workbook, `3x1` does not beat ABBYY on the artifact metric. It recovers more raw text, but it also produces more tagged artifact rows:
 
 - Paddle emits `6,817` more words than ABBYY
 - Paddle emits `8,805` more nonblank lines than ABBYY
@@ -71,8 +71,6 @@ This is the real `3x1` result, and it is meaningfully different from the earlier
 - The extra Paddle output is concentrated in separators, overlaps, and short-fragment structure rather than a clean artifact win
 
 So this `3x1` run looks more expansive than ABBYY on raw output size, but not cleaner on the tagged-artifact metric used in this dataset.
-
-The biggest pattern differences in `3x1` are still structural rather than cosmetic:
 
 - Paddle produces far more `isolated marker/separator` entries: `6,317` vs `3,200`
 - Paddle produces all detected `duplicate/tile overlap` entries: `103` vs `0`
@@ -159,7 +157,7 @@ Not every category improved:
 
 But those increases are smaller than the gains in the categories that most often made the `3x2` run look over-extracted.
 
-The biggest practical shift is in `oocihm.22250`, where `3x2` loses by page count (`65` Paddle wins vs `84` ABBYY wins, with `28` ties) but `3x1` flips that to a Paddle edge (`87` vs `71`, with `19` ties). The hardest cases do not change: `oocihm.N_00155_18750610` and `oocihm.N_00219_18600707` are still ABBYY sweeps in both tiling variants.
+The biggest practical shift is in `oocihm.22250`, where `3x2` loses by page count (`65` Paddle wins vs `84` ABBYY wins, with `28` ties) but `3x1` flips that to a Paddle edge (`87` vs `71`, with `19` ties). The hardest cases do not change: `oocihm.N_00155_18750610` and `oocihm.N_00219_18600707` are still ABBYY wins in both tiling variants.
 
 There is now also a direct ABBYY word-coverage workbook in this folder:
 
@@ -181,7 +179,7 @@ But the precision result cuts the other way and explains why `3x1` can still loo
 - token precision vs ABBYY: `3x2 = 84.52%`, `3x1 = 90.69%`
 - pages closest to ABBYY word count: `3x2 = 25`, `3x1 = 186`, ties `6`
 
-So `3x2` captures slightly more of ABBYY's tokens, while `3x1` stays much closer to ABBYY's page size. If your priority is maximum word capture, that still favors `3x2`.
+So `3x2` captures slightly more of ABBYY's tokens, while `3x1` stays much closer to ABBYY's page size. If our priority is maximum word capture, that still favors `3x2`.
 
 ![Token Precision vs ABBYY by Document](test-results/plots/png/tiling_3x2_vs_3x1_abbyy_word_precision.png)
 
@@ -192,7 +190,7 @@ There is now also a direct `3x2` vs `3x1` line-diff analysis in this folder:
 
 That comparison does not use ABBYY at all. It simply asks which lines are unique to one tiling run versus the other on the same page.
 
-The headline result is decisive:
+So `3x2` is more expansive than `3x1` on almost the entire dataset:
 
 - shared matched nonblank lines: `39,507`
 - `3x2`-only lines: `27,060`
@@ -200,8 +198,6 @@ The headline result is decisive:
 - pages where `3x2` has more unique-only lines: `200`
 - pages where `3x1` has more unique-only lines: `11`
 - tied pages: `6`
-
-So `3x2` is not just slightly more expansive than `3x1`. It is substantially more expansive on almost the entire dataset.
 
 ![Document Extra-Line Totals](test-results/plots/png/tiling_3x2_vs_3x1_document_extra_lines.png)
 

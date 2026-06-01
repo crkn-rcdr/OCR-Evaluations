@@ -63,16 +63,16 @@ Across all `217` no-tiling vs ABBYY page pairs:
 - ABBYY nonblank line count: `49,775`
 - no-tiling Paddle word count: `299,604`
 - ABBYY word count: `301,984`
-- no-tiling Paddle artifact entries: `7,874`
-- ABBYY artifact entries: `11,041`
+- no-tiling Paddle artifact entries: `5,844`
+- ABBYY artifact entries: `6,813`
 
 Page-level split:
 
-- no tiling lower on `94` pages
-- ABBYY lower on `109` pages
-- tied on `14` pages
+- no tiling lower on `93` pages
+- ABBYY lower on `108` pages
+- tied on `16` pages
 
-So the no-tiling run is not winning more pages than ABBYY, but it is dramatically lower on total artifact entries overall. The reason is that when no tiling is better, it is often better by a very large margin.
+So the no-tiling run is not winning more pages than ABBYY, and it is also slightly below ABBYY on total raw words. But it is still lower on total tagged artifact entries overall.
 
 That is the main surprise in this dataset:
 
@@ -81,21 +81,21 @@ That is the main surprise in this dataset:
 
 Its failure pattern is still recognizably Paddle-like:
 
-- `isolated marker/separator`: `4,055` vs ABBYY `2,962`
+- `isolated marker/separator`: `4,283` vs ABBYY `3,200`
 - `suspicious token`: `1,132` vs ABBYY `890`
-- `OCR token/phrase mismatch`: `283` vs ABBYY `124`
+- `OCR token/phrase mismatch`: `286` vs ABBYY `124`
 
 But no tiling is much lighter than the tiled runs on exactly the categories that made them look noisy:
 
-- `Possible duplicate lines`: `32`
+- `Possible duplicate lines`: `0`
 - `punctuation artifact`: `126`
-- `suspicious glyph`: `2,652`
+- `suspicious glyph`: `403`
 
 ABBYY still carries far more glyph, punctuation, and malformed-line-start debris:
 
-- `suspicious glyph`: `6,017`
-- `punctuation artifact`: `2,386`
-- `line-start artifact`: `298`
+- `suspicious glyph`: `804`
+- `punctuation artifact`: `2,401`
+- `line-start artifact`: `429`
 
 ## Key Charts
 
@@ -103,13 +103,13 @@ These are the charts that best support the interpretation in this README.
 
 ### 1. No-Tiling Word Recovery vs ABBYY
 
-This shows the raw coverage problem directly. No tiling is often cleaner, but it does not hold line structure as well as ABBYY.
+This shows the raw coverage problem directly. No tiling is often cleaner, but it does not hold line structure or total word volume as consistently as ABBYY.
 
 ![Document Word Recovery](test-results/plots/png/document_word_recovery.png)
 
 ### 2. No-Tiling Artifact Totals vs ABBYY
 
-This is the clearest statement of why the no-tiling run looks attractive at first glance: the total artifact count drops sharply on most documents.
+This is the clearest statement of why the no-tiling run looks attractive at first glance: the total artifact count drops sharply on several documents.
 
 ![Document Artifact Totals](test-results/plots/png/document_artifact_totals.png)
 
@@ -125,20 +125,19 @@ These outliers explain most of the aggregate gap. Red bars mean Paddle had more 
 
 ![Largest Page-Level Artifact Deltas](test-results/plots/png/page_artifact_delta.png)
 
-
 ## Document-Level Findings
 
 The no-tiling run is extremely polarized by document:
 
-- `aeu.00037_19470820`: no-tiling Paddle has the lower artifact count than ABBYY on all `8` pages. The document-level artifact totals are `2,668` for no-tiling Paddle versus `4,114` for ABBYY. This is the clearest evidence that removing tiling can sharply reduce the punctuation-and-glyph collapse on dense results pages.
-- `oocihm.N_00126_19130805`: no-tiling Paddle is lower than ABBYY on all `8` pages. The document-level artifact totals are `551` for no-tiling Paddle versus `898` for ABBYY.
-- `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4`. The document-level artifact totals are `198` for no-tiling Paddle versus `920` for ABBYY.
-- `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8`. The document-level artifact totals are `263` for no-tiling Paddle versus `863` for ABBYY.
-- `oocihm.N_00138_18940629`: no-tiling Paddle is lower than ABBYY on `7` pages, and ABBYY is lower on `1`. The document-level artifact totals are `807` for no-tiling Paddle versus `1,384` for ABBYY.
-- `oocihm.N_00219_18600707`: this one is genuinely mixed. No-tiling Paddle has the lower artifact count on `2` of the `4` pages, and ABBYY has the lower artifact count on the other `2` pages. Across the whole document, the summed artifact-entry totals still lean slightly toward no tiling: `814` artifact entries for no-tiling Paddle versus `936` artifact entries for ABBYY.
-- `oocihm.22250`: this is the hardest counterexample. ABBYY is lower on `106` pages, no-tiling Paddle is lower on only `57`, and `14` pages tie. The document-level artifact totals also lean toward ABBYY: `2,573` for no-tiling Paddle versus `1,926` for ABBYY. So this volume is the clearest case where the no-tiling cleanup gains are not enough to outweigh the pages where ABBYY stays structurally safer.
+- `aeu.00037_19470820`: this one is genuinely mixed by page count at `4` to `4`, but the document-level totals still favor no tiling strongly: `1,128` artifact entries for no-tiling Paddle versus `2,131` for ABBYY.
+- `oocihm.N_00126_19130805`: no-tiling Paddle is lower than ABBYY on `7` of the `8` pages. The document-level artifact totals are `513` for no-tiling Paddle versus `662` for ABBYY.
+- `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4` pages. The document-level artifact totals are `146` for no-tiling Paddle versus `354` for ABBYY, but the word-count loss here is extreme.
+- `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8` pages. The document-level artifact totals are `232` for no-tiling Paddle versus `424` for ABBYY.
+- `oocihm.N_00138_18940629`: this one is close. No-tiling Paddle is lower on `5` pages and ABBYY is lower on `3`, but the document-level totals are nearly tied: `761` for no-tiling Paddle versus `749` for ABBYY.
+- `oocihm.N_00219_18600707`: ABBYY is lower on `3` of the `4` pages, and the document-level totals also lean toward ABBYY: `782` artifact entries for no-tiling Paddle versus `737` for ABBYY. No tiling still emits far more words here, so this remains one of the strongest examples of extra output not translating into a cleaner page.
+- `oocihm.22250`: this is still the hardest counterexample. ABBYY is lower on `97` pages, no-tiling Paddle is lower on `64`, and `16` pages tie. The document-level artifact totals also lean toward ABBYY: `2,282` for no-tiling Paddle versus `1,756` for ABBYY. This is also the strongest no-tiling over-extraction case by raw word count.
 
-So the no-tiling run is not simply “better on clean prose and worse on hard layouts.” It can also beat ABBYY on some very dense structure-heavy pages. The real pattern is narrower:
+So the no-tiling run is not simply "better on clean prose and worse on hard layouts." It can also beat ABBYY on some very dense structure-heavy pages. The real pattern is narrower:
 
 - no tiling sharply suppresses some of the duplicated or fragmented text behavior that tiling introduced
 - but it also gives up too much consistent coverage across the full corpus
@@ -149,7 +148,7 @@ The cross-run comparison changes the recommendation.
 
 By aggregate artifact count, the ordering is clear:
 
-- no tiling: `7,874`
+- no tiling: `5,844`
 - `3x1`: `10,614`
 - `3x2`: `10,999`
 
@@ -188,53 +187,45 @@ The direct line-diff workbooks show the same thing from another angle:
 
 ![3x2 vs No Tiling Document Extra Lines](test-results/plots/png/3x2_vs_no_tiling_document_extra_lines.png)
 
-So no tiling is not just “`3x1` minus tile overlap.” It is a materially different OCR pass, with lower word capture on some documents and higher word capture on others.
-
-One important note about the merged artifact workbook:
-
-- [paddle_variants_abbyy_artifacts.xlsx](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\test-results\paddle_variants_abbyy_artifacts.xlsx) uses the no-tiling ABBYY pairing as the canonical ABBYY artifact baseline
-- that is intentional because the `ABBYY` mismatch-tag counts are pair-dependent, while the Paddle totals are the quantities being compared side by side
-
+So no tiling is not just `3x1` minus tile overlap. It is a materially different OCR pass, with lower word capture on some documents and higher word capture on others.
 
 ## Document Matrix
 
 ### Paddle More Words And Less Artifacts
 
-- `oocihm.N_00219_18600707`: no tiling has `25,831` words versus `19,479` for ABBYY, a gain of `6,352` words. Artifact totals also favor no tiling: `814` artifact entries versus `936` for ABBYY.
-
-![Representative more-words less-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
-
-- `oocihm.N_00155_18880712`: no tiling has `50,200` words versus `49,227` for ABBYY, a gain of `973` words. Artifact totals also favor no tiling: `263` artifact entries versus `863` for ABBYY.
+- `oocihm.N_00155_18880712`: no tiling has `50,200` words versus `49,227` for ABBYY, a gain of `973` words. Artifact totals also favor no tiling: `232` artifact entries versus `424` for ABBYY.
 
 ![Representative more-words less-artifacts page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
 
 ### Paddle More Words And More Artifacts
 
-- `oocihm.22250`: no tiling has `102,132` words versus `75,684` for ABBYY, a gain of `26,448` words. Artifact totals cut the other way: `2,573` artifact entries for no tiling versus `1,926` for ABBYY.
+- `oocihm.22250`: no tiling has `102,132` words versus `75,684` for ABBYY, a gain of `26,448` words. Artifact totals cut the other way: `2,282` artifact entries for no tiling versus `1,756` for ABBYY.
 
 ![Representative more-words more-artifacts page from oocihm.22250](test-data/abbyy/oocihm.22250/0160.jpg)
 
+- `oocihm.N_00219_18600707`: no tiling has `25,831` words versus `19,479` for ABBYY, a gain of `6,352` words. Artifact totals cut the other way: `782` artifact entries for no tiling versus `737` for ABBYY.
+
+![Representative more-words more-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
+
 ### Paddle Less Words And Less Artifacts
 
-- `oocihm.N_00155_18750610`: no tiling has `27,204` words versus `59,393` for ABBYY, a loss of `32,189` words. Artifact totals still favor no tiling strongly: `198` artifact entries versus `920` for ABBYY.
+- `aeu.00037_19470820`: no tiling has `31,338` words versus `32,049` for ABBYY, a loss of `711` words. Artifact totals still favor no tiling strongly: `1,128` artifact entries versus `2,131` for ABBYY.
+
+![Representative less-words less-artifacts page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
+
+- `oocihm.N_00155_18750610`: no tiling has `27,204` words versus `59,393` for ABBYY, a loss of `32,189` words. Artifact totals still favor no tiling strongly: `146` artifact entries versus `354` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
 
-- `oocihm.N_00138_18940629`: no tiling has `36,461` words versus `39,623` for ABBYY, a loss of `3,162` words. Artifact totals still favor no tiling: `807` artifact entries versus `1,384` for ABBYY.
-
-![Representative less-words less-artifacts page from oocihm.N_00138_18940629](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
-
-- `oocihm.N_00126_19130805`: no tiling has `26,438` words versus `26,529` for ABBYY, a loss of only `91` words. Artifact totals also favor no tiling: `551` artifact entries versus `898` for ABBYY.
+- `oocihm.N_00126_19130805`: no tiling has `26,438` words versus `26,529` for ABBYY, a loss of only `91` words. Artifact totals still favor no tiling: `513` artifact entries versus `662` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
 
 ### Paddle Less Words And More Artifacts
 
-There are no document-level examples in this dataset. Every document either:
+- `oocihm.N_00138_18940629`: no tiling has `36,461` words versus `39,623` for ABBYY, a loss of `3,162` words. Artifact totals also lean slightly toward ABBYY: `761` artifact entries for no tiling versus `749` for ABBYY.
 
-- gains words with more artifacts,
-- gains words with fewer artifacts, or
-- loses words while still reducing artifacts.
+![Representative less-words more-artifacts page from oocihm.N_00138_18940629](test-data/abbyy/oocihm.N_00138_18940629/oocihm.N_00138_18940629.7.jpg)
 
 ## Recommendation
 
@@ -274,12 +265,11 @@ Using ABBYY as the merged-workbook baseline at `6,813` artifact entries:
 3. `3x2 + docparse + PaddleOCR + PaddleVL`
    Measured as `10,999` artifact entries.
 
-So the no-tiling run is not a failure. It is a real and useful point on the tradeoff curve:
+So the no-tiling run is a useful point on the tradeoff curve:
 
 - much cleaner than the tiled runs
 - often dramatically cleaner than ABBYY on the right pages
 - strongest on raw cleanliness, but not the strongest overall word-capture option across the full dataset
-
 
 ## Regenerating The Results
 

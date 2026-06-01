@@ -1,6 +1,6 @@
 # Multi-Document ABBYY vs Tiled 3x1 PaddleOCR + Chandra Comparison
 
-This folder evaluates the new `3x1 + docparse + PaddleOCR + Chandra` run against:
+This folder evaluates the `3x1 + docparse + PaddleOCR + Chandra` run against:
 
 - `ABBYY` outputs from [../3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/test-data/abbyy](../3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/test-data/abbyy)
 - the existing `3x1 + docparse + PaddleOCR + PaddleVL` run from [../3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/test-data/preprocessing-tiling_3x1_dp+paddleocr+vl+clean](../3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/test-data/preprocessing-tiling_3x1_dp+paddleocr+vl+clean)
@@ -55,25 +55,25 @@ Across all `217` Chandra vs ABBYY page pairs:
 - ABBYY nonblank line count: `49,775`
 - Chandra word count: `308,593`
 - ABBYY word count: `301,984`
-- Chandra artifact entries: `10,750`
-- ABBYY artifact entries: `11,057`
+- Chandra artifact entries: `8,829`
+- ABBYY artifact entries: `6,831`
 
 Page-level split:
 
-- Chandra lower on `105` pages
-- ABBYY lower on `90` pages
-- tied on `22` pages
+- Chandra lower on `90` pages
+- ABBYY lower on `107` pages
+- tied on `20` pages
 
-So the Chandra run still beats ABBYY on total artifact entries, but only narrowly. The stronger result is not "Chandra replaces ABBYY." It is:
+So the current Chandra run does not beat ABBYY on total artifact entries. It has the familiar tiled-Paddle shape, but the direct artifact workbook says:
 
-- Chandra keeps the same broad `3x1` structural shape as the PaddleVL run
-- Chandra remains cleaner than ABBYY in aggregate
-- but Chandra is slightly weaker than the existing `3x1 + PaddleVL` run on both artifact control and ABBYY token recovery
+- Chandra emits `6,609` more words than ABBYY
+- Chandra emits `8,805` more nonblank lines than ABBYY
+- Chandra produces `1,998` more artifact entries than ABBYY
 
 The direct `Chandra` vs `PaddleVL` comparison is very consistent:
 
-- `PaddleVL` artifact entries: `10,614`
-- `Chandra` artifact entries: `10,750`
+- `PaddleVL` artifact entries: `8,614`
+- `Chandra` artifact entries: `8,829`
 - `PaddleVL` ABBYY token-occurrence coverage: `92.98%`
 - `Chandra` ABBYY token-occurrence coverage: `92.45%`
 - `PaddleVL` ABBYY unique-token coverage: `90.19%`
@@ -85,6 +85,11 @@ On raw word count, `PaddleVL` is also slightly ahead:
 - `Chandra`: `308,593` raw words
 
 So there is not a separate word-count case for preferring `Chandra` over the existing `3x1 + PaddleVL` run.
+
+Overall:
+- Chandra keeps the same broad `3x1` structural shape as the PaddleVL run
+- Chandra stays close to the existing `3x1 + PaddleVL` run on raw size
+- but Chandra is weaker than the existing `3x1 + PaddleVL` run on both artifact control and ABBYY token recovery
 
 ## Key Charts
 
@@ -102,7 +107,7 @@ This is the fastest way to see where Chandra is cleaner than ABBYY and where it 
 
 ### 3. Chandra vs PaddleVL ABBYY Token Coverage
 
-This chart shows that the older `3x1 + PaddleVL` run stays ahead on ABBYY recovery across every document, even though the margins are usually small.
+This chart shows that the older `3x1 + PaddleVL` run stays ahead on ABBYY recovery across every document.
 
 ![Chandra vs PaddleVL ABBYY Coverage](test-results/plots/png/chandra_vs_paddlevl_abbyy_word_coverage/paddle_variants_abbyy_word_coverage.png)
 
@@ -132,41 +137,38 @@ This confirms that the two runs produce the same total nonblank line count and t
 
 ## Chandra vs ABBYY
 
-The Chandra run is still better than ABBYY on total artifact entries, but the margin is modest: `10,750` Chandra artifact entries vs `11,057` ABBYY artifact entries.
+The Chandra run is not cleaner than ABBYY on the current artifact workbook. Its total artifact count is `8,829` versus `6,831` for ABBYY.
 
 Its strongest categories against ABBYY are the same categories where the tiled Paddle pipelines already tended to look better:
 
-- `suspicious glyph`: `3,027` Chandra artifact entries vs `6,017` ABBYY artifact entries
-- `punctuation artifact`: `470` Chandra artifact entries vs `2,386` ABBYY artifact entries
-- `line-start artifact`: `16` Chandra artifact entries vs `298` ABBYY artifact entries
+- `suspicious glyph`: `682` Chandra artifact entries vs `804` ABBYY artifact entries
+- `punctuation artifact`: `470` Chandra artifact entries vs `2,401` ABBYY artifact entries
+- `line-start artifact`: `16` Chandra artifact entries vs `429` ABBYY artifact entries
 - `spacing/joined text`: `2` Chandra artifact entries vs `82` ABBYY artifact entries
 
 Its weakest categories are also familiar:
 
-- `isolated marker/separator`: `5,920` Chandra artifact entries vs `2,962` ABBYY artifact entries
+- `isolated marker/separator`: `6,313` Chandra artifact entries vs `3,200` ABBYY artifact entries
 - `suspicious token`: `1,270` Chandra artifact entries vs `890` ABBYY artifact entries
-- `OCR token/phrase mismatch`: `450` Chandra artifact entries vs `125` ABBYY artifact entries
-- `Possible duplicate lines`: `101` Chandra artifact entries vs `0` ABBYY artifact entries
+- `OCR token/phrase mismatch`: `457` Chandra artifact entries vs `126` ABBYY artifact entries
+- `Possible duplicate lines`: `102` Chandra artifact entries vs `0` ABBYY artifact entries
 
-Document-level artifact totals split into two groups.
+Document-level artifact totals split more sharply toward ABBYY.
 
-Documents where Chandra is cleaner than ABBYY:
+The only document where Chandra is cleaner than ABBYY on total artifact entries:
 
-- `oocihm.N_00155_18880712`: `454` Chandra artifact entries vs `864` ABBYY artifact entries
-- `oocihm.N_00126_19130805`: `745` Chandra artifact entries vs `899` ABBYY artifact entries
-- `oocihm.N_00155_18750610`: `784` Chandra artifact entries vs `921` ABBYY artifact entries
-- `aeu.00037_19470820`: `4,048` Chandra artifact entries vs `4,107` ABBYY artifact entries
-- `oocihm.N_00138_18940629`: `1,381` Chandra artifact entries vs `1,385` ABBYY artifact entries
+- `oocihm.N_00155_18880712`: `422` Chandra artifact entries vs `426` ABBYY artifact entries
 
 Documents where ABBYY stays cleaner:
 
-- `oocihm.22250`: `2,069` Chandra artifact entries vs `1,942` ABBYY artifact entries
-- `oocihm.N_00219_18600707`: `1,269` Chandra artifact entries vs `939` ABBYY artifact entries
+- `aeu.00037_19470820`: `2,464` Chandra artifact entries vs `2,123` ABBYY artifact entries
+- `oocihm.22250`: `1,879` Chandra artifact entries vs `1,773` ABBYY artifact entries
+- `oocihm.N_00126_19130805`: `713` Chandra artifact entries vs `663` ABBYY artifact entries
+- `oocihm.N_00138_18940629`: `1,362` Chandra artifact entries vs `751` ABBYY artifact entries
+- `oocihm.N_00155_18750610`: `724` Chandra artifact entries vs `355` ABBYY artifact entries
+- `oocihm.N_00219_18600707`: `1,265` Chandra artifact entries vs `740` ABBYY artifact entries
 
-So the Chandra result is still the same broad story as the other Paddle-style runs:
-
-- very good at cutting glyph and punctuation debris
-- still vulnerable to separator-heavy and token-garbling failure modes
+So the Chandra result has the same broad Paddle-style strengths and weaknesses, but it does not beat ABBYY overall.
 
 ## Chandra vs 3x1 + PaddleVL
 
@@ -180,25 +182,25 @@ On ABBYY recovery:
 
 On closeness to ABBYY word count:
 
-- `PaddleVL` wins `77` pages
-- `Chandra` wins `64`
-- `76` pages tie
+- `PaddleVL` wins `80` pages
+- `Chandra` wins `53`
+- `84` pages tie
 
 On total artifact count:
 
-- `PaddleVL` has the lower artifact count on `76` pages
-- `Chandra` has the lower artifact count on `33`
-- `108` pages tie
+- `PaddleVL` has the lower artifact count on `77` pages
+- `Chandra` has the lower artifact count on `30`
+- `110` pages tie
 
 At the document level, `PaddleVL` is cleaner on every single document:
 
-- `aeu.00037_19470820`: `4,022` PaddleVL artifact entries vs `4,048` Chandra artifact entries
-- `oocihm.22250`: `2,040` PaddleVL artifact entries vs `2,069` Chandra artifact entries
-- `oocihm.N_00126_19130805`: `731` PaddleVL artifact entries vs `745` Chandra artifact entries
-- `oocihm.N_00138_18940629`: `1,354` PaddleVL artifact entries vs `1,381` Chandra artifact entries
-- `oocihm.N_00155_18750610`: `758` PaddleVL artifact entries vs `784` Chandra artifact entries
-- `oocihm.N_00155_18880712`: `443` PaddleVL artifact entries vs `454` Chandra artifact entries
-- `oocihm.N_00219_18600707`: `1,266` PaddleVL artifact entries vs `1,269` Chandra artifact entries
+- `aeu.00037_19470820`: `2,379` PaddleVL artifact entries vs `2,464` Chandra artifact entries
+- `oocihm.22250`: `1,852` PaddleVL artifact entries vs `1,879` Chandra artifact entries
+- `oocihm.N_00126_19130805`: `697` PaddleVL artifact entries vs `713` Chandra artifact entries
+- `oocihm.N_00138_18940629`: `1,322` PaddleVL artifact entries vs `1,362` Chandra artifact entries
+- `oocihm.N_00155_18750610`: `691` PaddleVL artifact entries vs `724` Chandra artifact entries
+- `oocihm.N_00155_18880712`: `412` PaddleVL artifact entries vs `422` Chandra artifact entries
+- `oocihm.N_00219_18600707`: `1,261` PaddleVL artifact entries vs `1,265` Chandra artifact entries
 
 It is also better on ABBYY token coverage on every document:
 
@@ -235,6 +237,7 @@ The extra-line workbook gives one important nuance. These are not two runs with 
 - both runs have the same nonblank line count: `58,580` nonblank lines each
 - both runs have the same shared matched-line count: `51,901` matched lines each
 - both runs also have the same unique-only line count against each other: `6,679` unique-only lines each
+- every page is tied on unique-only line count
 
 That means the main difference is not "Chandra creates more lines" or "PaddleVL creates more lines." The difference is mostly textual substitution inside a very similar line skeleton.
 
@@ -252,26 +255,6 @@ One note about the merged artifact workbook:
 
 ## Recommendation
 
-These rankings use ABBYY as the baseline reference at `301,984` raw words.
-
-If the deciding metric is `raw total word count`, the ranking is:
-
-1. `3x1 + docparse + PaddleOCR + PaddleVL`
-   Measured as `308,801` raw words.
-2. `3x1 + docparse + PaddleOCR + Chandra`
-   Measured as `308,593` raw words.
-
-If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking is:
-
-1. `3x1 + docparse + PaddleOCR + PaddleVL`
-   Measured as `308,801` raw words with `8,614` artifact entries.
-2. `3x1 + docparse + PaddleOCR + Chandra`
-   Measured as `308,593` raw words with `8,829` artifact entries.
-
-So the practical recommendation is straightforward:
-
-- `Chandra` is a valid run and still cleaner than ABBYY overall
-- but it does not improve on the existing `3x1 + PaddleVL` default
-- `PaddleVL` has the higher raw word count, better ABBYY matching, and lower artifact totals
+`3x1 + docparse + PaddleOCR + PaddleVL` has the higher raw word count, better ABBYY matching, and lower artifact totals
 
 For this dataset series, `3x1 + docparse + PaddleOCR + PaddleVL` remains the better default.
