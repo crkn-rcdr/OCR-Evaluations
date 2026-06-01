@@ -233,8 +233,6 @@ This is the canonical recommendation for the three Paddle variants in this datas
 
 These rankings use ABBYY as the baseline reference at `301,984` raw words.
 
-The document-matrix difference between `3x2` and `3x1` does not overturn the cross-run recommendation. `3x2` is more uniformly expansive relative to ABBYY, so it never lands in the document-level `less words` buckets. `3x1` does, which is exactly why it can serve as the middle-ground option between `3x2`'s higher word volume and no tiling's lower artifact count.
-
 If the deciding metric is `raw total word count`, the ranking is:
 
 1. `3x2 + docparse + PaddleOCR + PaddleVL`
@@ -247,12 +245,12 @@ If the deciding metric is `raw total word count`, the ranking is:
 If the deciding metric is `runtime`, the ranking is:
 
 1. no tiling + `PaddleOCR + PaddleVL`
-   About `53.6%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`, or about `113.35` seconds.
+   About `53.6%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
-   About `6.7%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`, or about `227.91` seconds.
+   About `6.7%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`.
 3. `3x2 + docparse + PaddleOCR + PaddleVL` was the slowest of the three, and used as te baseline.
 
-If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking is:
+If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking might be:
 
 1. `3x1 + docparse + PaddleOCR + PaddleVL`
    Measured as `308,801` raw words with `10,614` artifact entries.
@@ -261,6 +259,8 @@ If the deciding metric is `best overall balance of raw word volume and artifact 
 3. no tiling
    Measured as `299,604` raw words with `5,844` artifact entries.
    Canonical artifact baseline in the merged workbook: `6,813` artifact entries.
+
+However, 3x2 gains `25,511` raw words, and only adds `385` artifact entries. `3x2` is more uniformly expansive relative to ABBYY, so it never lands in the document-level `less words` buckets. 
 
 If the deciding metric is `lowest artifact count`, the ranking is:
 
