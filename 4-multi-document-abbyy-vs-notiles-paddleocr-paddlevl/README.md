@@ -248,7 +248,7 @@ If the deciding metric is `runtime`, the ranking is:
    About `53.6%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`.
 2. `3x1 + docparse + PaddleOCR + PaddleVL`
    About `6.7%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`.
-3. `3x2 + docparse + PaddleOCR + PaddleVL` was the slowest of the three, and used as te baseline.
+3. `3x2 + docparse + PaddleOCR + PaddleVL` was the slowest of the three, and used as the baseline.
 
 If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking might be:
 
