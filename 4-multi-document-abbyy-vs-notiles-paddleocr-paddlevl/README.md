@@ -134,8 +134,8 @@ The no-tiling run is extremely polarized by document:
 - `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4` pages. The document-level artifact totals are `146` for no-tiling Paddle versus `354` for ABBYY, but the word-count loss here is extreme.
 - `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8` pages. The document-level artifact totals are `232` for no-tiling Paddle versus `424` for ABBYY.
 - `oocihm.N_00138_18940629`: this one is close. No-tiling Paddle is lower on `5` pages and ABBYY is lower on `3`, but the document-level totals are nearly tied: `761` for no-tiling Paddle versus `749` for ABBYY.
-- `oocihm.N_00219_18600707`: ABBYY is lower on `3` of the `4` pages, and the document-level totals also lean toward ABBYY: `782` artifact entries for no-tiling Paddle versus `737` for ABBYY. No tiling still emits far more words here, so this remains one of the strongest examples of extra output not translating into a cleaner page.
-- `oocihm.22250`: this is still the hardest counterexample. ABBYY is lower on `97` pages, no-tiling Paddle is lower on `64`, and `16` pages tie. The document-level artifact totals also lean toward ABBYY: `2,282` for no-tiling Paddle versus `1,756` for ABBYY. This is also the strongest no-tiling over-extraction case by raw word count.
+- `oocihm.N_00219_18600707`: ABBYY is lower on `3` of the `4` pages, and the document-level totals lean toward ABBYY: `782` artifact entries for no-tiling Paddle versus `737` for ABBYY. No tiling still emits far more words here, so this remains one of the strongest examples of extra output not translating into a cleaner page.
+- `oocihm.22250`: this is still the hardest counterexample. ABBYY is lower on `97` pages, no-tiling Paddle is lower on `64`, and `16` pages tie. The document-level artifact totals lean toward ABBYY: `2,282` for no-tiling Paddle versus `1,756` for ABBYY. This is also the strongest no-tiling over-extraction case by raw word count.
 
 So the no-tiling run is not simply "better on clean prose and worse on hard layouts." It can also beat ABBYY on some very dense structure-heavy pages. The real pattern is narrower:
 

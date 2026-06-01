@@ -159,7 +159,7 @@ Some broad document-level patterns from the aggregate workbook:
 
 ![Representative more-words more-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
 
-- `oocihm.N_00219_18600707`: `3x2` has `21,460` words versus `19,479` for ABBYY, a gain of `1,981` words. Artifact totals also lean toward ABBYY: `1,332` artifact entries for `3x2` versus `744` for ABBYY.
+- `oocihm.N_00219_18600707`: `3x2` has `21,460` words versus `19,479` for ABBYY, a gain of `1,981` words. Artifact totals lean toward ABBYY: `1,332` artifact entries for `3x2` versus `744` for ABBYY.
 
 ![Representative more-words more-artifacts page from oocihm.N_00219_18600707](test-data/abbyy/oocihm.N_00219_18600707/oocihm.N_00219_18600707.3.jpg)
 
