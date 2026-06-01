@@ -129,7 +129,7 @@ These outliers explain most of the aggregate gap. Red bars mean Paddle had more 
 
 The no-tiling run is extremely polarized by document:
 
-- `aeu.00037_19470820`: this one is genuinely mixed by page count at `4` to `4`, but the document-level totals still favor no tiling strongly: `1,128` artifact entries for no-tiling Paddle versus `2,131` for ABBYY.
+- `aeu.00037_19470820`: this one is genuinely mixed by page count at `4` to `4`, but the document-level totals still favour no tiling strongly: `1,128` artifact entries for no-tiling Paddle versus `2,131` for ABBYY.
 - `oocihm.N_00126_19130805`: no-tiling Paddle is lower than ABBYY on `7` of the `8` pages. The document-level artifact totals are `513` for no-tiling Paddle versus `662` for ABBYY.
 - `oocihm.N_00155_18750610`: no-tiling Paddle is lower than ABBYY on all `4` pages. The document-level artifact totals are `146` for no-tiling Paddle versus `354` for ABBYY, but the word-count loss here is extreme.
 - `oocihm.N_00155_18880712`: no-tiling Paddle is lower than ABBYY on all `8` pages. The document-level artifact totals are `232` for no-tiling Paddle versus `424` for ABBYY.
@@ -193,7 +193,7 @@ So no tiling is not just `3x1` minus tile overlap. It is a materially different 
 
 ### Paddle More Words And Less Artifacts
 
-- `oocihm.N_00155_18880712`: no tiling has `50,200` words versus `49,227` for ABBYY, a gain of `973` words. Artifact totals also favor no tiling: `232` artifact entries versus `424` for ABBYY.
+- `oocihm.N_00155_18880712`: no tiling has `50,200` words versus `49,227` for ABBYY, a gain of `973` words. Artifact totals also favour no tiling: `232` artifact entries versus `424` for ABBYY.
 
 ![Representative more-words less-artifacts page from oocihm.N_00155_18880712](test-data/abbyy/oocihm.N_00155_18880712/oocihm.N_00155_18880712.6.jpg)
 
@@ -209,15 +209,15 @@ So no tiling is not just `3x1` minus tile overlap. It is a materially different 
 
 ### Paddle Less Words And Less Artifacts
 
-- `aeu.00037_19470820`: no tiling has `31,338` words versus `32,049` for ABBYY, a loss of `711` words. Artifact totals still favor no tiling strongly: `1,128` artifact entries versus `2,131` for ABBYY.
+- `aeu.00037_19470820`: no tiling has `31,338` words versus `32,049` for ABBYY, a loss of `711` words. Artifact totals still favour no tiling strongly: `1,128` artifact entries versus `2,131` for ABBYY.
 
 ![Representative less-words less-artifacts page from aeu.00037_19470820](test-data/abbyy/aeu.00037_19470820/aeu.00037_19470820.1.jpg)
 
-- `oocihm.N_00155_18750610`: no tiling has `27,204` words versus `59,393` for ABBYY, a loss of `32,189` words. Artifact totals still favor no tiling strongly: `146` artifact entries versus `354` for ABBYY.
+- `oocihm.N_00155_18750610`: no tiling has `27,204` words versus `59,393` for ABBYY, a loss of `32,189` words. Artifact totals still favour no tiling strongly: `146` artifact entries versus `354` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00155_18750610](test-data/abbyy/oocihm.N_00155_18750610/oocihm.N_00155_18750610.4.jpg)
 
-- `oocihm.N_00126_19130805`: no tiling has `26,438` words versus `26,529` for ABBYY, a loss of only `91` words. Artifact totals still favor no tiling: `513` artifact entries versus `662` for ABBYY.
+- `oocihm.N_00126_19130805`: no tiling has `26,438` words versus `26,529` for ABBYY, a loss of only `91` words. Artifact totals still favour no tiling: `513` artifact entries versus `662` for ABBYY.
 
 ![Representative less-words less-artifacts page from oocihm.N_00126_19130805](test-data/abbyy/oocihm.N_00126_19130805/oocihm.N_00126_19130805.1.jpg)
 
