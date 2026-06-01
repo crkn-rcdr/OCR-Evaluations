@@ -255,6 +255,8 @@ One note about the merged artifact workbook:
 
 ## Recommendation
 
-`3x1 + docparse + PaddleOCR + PaddleVL` has the higher raw word count, better ABBYY matching, and lower artifact totals
+`3x1 + docparse + PaddleOCR + PaddleVL` has the higher raw word count, better ABBYY matching, and lower artifact totals.
+
+`3x1 + docparse + PaddleOCR + Chandra` was also about 39.0% slower in execution than `3x1 + docparse + PaddleOCR + PaddleVL.` 
 
 For this dataset series, `3x1 + docparse + PaddleOCR + PaddleVL` remains the better default.

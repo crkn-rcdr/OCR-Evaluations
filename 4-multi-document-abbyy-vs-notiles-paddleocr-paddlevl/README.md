@@ -244,6 +244,14 @@ If the deciding metric is `raw total word count`, the ranking is:
 3. no tiling
    Measured as `299,604` raw words.
 
+If the deciding metric is `runtime`, the ranking is:
+
+1. no tiling + `PaddleOCR + PaddleVL`
+   About `53.6%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`, or about `113.35` seconds.
+2. `3x1 + docparse + PaddleOCR + PaddleVL`
+   About `6.7%` faster than `3x2 + docparse + PaddleOCR + PaddleVL`, or about `227.91` seconds.
+3. `3x2 + docparse + PaddleOCR + PaddleVL` was the slowest of the three, and used as te baseline.
+
 If the deciding metric is `best overall balance of raw word volume and artifact control`, the ranking is:
 
 1. `3x1 + docparse + PaddleOCR + PaddleVL`
