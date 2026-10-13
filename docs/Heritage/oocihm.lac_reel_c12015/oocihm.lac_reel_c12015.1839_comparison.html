@@ -1061,16 +1061,28 @@
   attachPanZoom(panelRight);
 
   function fitToView() {
-    const panelW = panelLeft.clientWidth || 800;
-    const panelH = panelLeft.clientHeight || 900;
-    scale = Math.min(panelW / pageWidth, panelH / pageHeight);
+    const rect = panelLeft.getBoundingClientRect();
+    const panelW = (rect && rect.width > 0) ? rect.width : (panelLeft.clientWidth || 800);
+    const panelH = (rect && rect.height > 0) ? rect.height : (panelLeft.clientHeight || 700);
+
+    // Safe margins (24px) so neither height nor width is ever clipped by window edges
+    const padX = 24;
+    const padY = 24;
+    const availW = Math.max(50, panelW - padX);
+    const availH = Math.max(50, panelH - padY);
+
+    scale = Math.min(availW / pageWidth, availH / pageHeight);
     panX = (panelW - pageWidth * scale) / 2;
-    panY = 10;
+    panY = (panelH - pageHeight * scale) / 2;
     updateTransform();
   }
 
+  // Initial fit on load - starts out fully zoomed out
   fitToView();
+  window.addEventListener("load", fitToView);
   window.addEventListener("resize", fitToView);
+  setTimeout(fitToView, 50);
+  setTimeout(fitToView, 250);
 
   document.getElementById("btnResetView").onclick = () => {
     fitToView();
