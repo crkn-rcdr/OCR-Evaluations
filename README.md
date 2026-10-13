@@ -941,11 +941,94 @@ A fallback category for any tagged reason that does not map to the named groups 
 Interpretation:  
 Usually sparse or absent, but kept for completeness.
 
+## Interactive Visual Quality Benchmark & Manual Adjudication
+
+The repository includes an interactive web-based comparison benchmark deployed via GitHub Pages at:  
+👉 **[https://crkn-rcdr.github.io/OCR-Evaluations/](https://crkn-rcdr.github.io/OCR-Evaluations/)**
+
+This tool enables side-by-side visual inspection of every word bounding box, concordance rate, and lexical dispute between the **PaddleOCR Pipeline** and **ABBYY FineReader**. Reviewers can manually arbitrate contested words directly in the browser, export decisions, and sync them back to the repository.
+
+![Master AI Dashboard Overview](docs/assets/dashboard_overview.png)
+
+---
+
+### Reviewer Workflow: Adjudicating Discrepancies
+
+![Interactive Comparison Viewer & Adjudication Inspector](docs/assets/comparison_viewer.png)
+
+1. **Open the Benchmark**:
+   - Go to [https://crkn-rcdr.github.io/OCR-Evaluations/](https://crkn-rcdr.github.io/OCR-Evaluations/) and select any document or page from the explorer table.
+2. **Select a Word Box or Card**:
+   - Click on any **orange box** (discrepancy) on the scanned page, or click any word card in the right sidebar.
+   - The **Adjudication Inspector** opens at the top right, displaying the rival words side-by-side, dictionary validation tags, IoU, and similarity.
+3. **Choose the Winner**:
+   - **Paddle Win** (Keyboard: `P` or `1`)
+   - **ABBYY Win** (Keyboard: `B` or `2`)
+   - **Both Valid** (Keyboard: `T` or `3`)
+   - **Neither Valid** (Keyboard: `N` or `4`)
+   - **Reset to Auto** (Keyboard: `R`)
+   - *Navigation*: Use `↓` / `↑` arrow keys to jump between discrepancies.
+4. All decisions are saved in your browser (`localStorage`) and immediately recalculate the live QA win rate, card badges, and filter counters.
+
+---
+
+### Exporting Your Determinations
+
+When you finish reviewing a batch of pages:
+1. Return to the **Master AI Dashboard** (`index.html`).
+2. Verify the purple review counter in the top bar:  
+   `✍️ N reviews across X pages`
+3. Click the blue **"Export All Reviews"** button in the top navigation bar.
+4. Your browser will download a single bundle file:
+   ```
+   crkn_all_manual_adjudications.json
+   ```
+
+*(Alternatively, clicking "Export JSON" on any individual comparison page downloads a single-page override file: `<item_name>_adjudications.json`.)*
+
+---
+
+### Publishing the Central File to GitHub
+
+To share your determinations so everyone on the team has access to the central consensus:
+
+#### Via GitHub Web Interface:
+1. Open the repository on GitHub: [https://github.com/crkn-rcdr/OCR-Evaluations](https://github.com/crkn-rcdr/OCR-Evaluations).
+2. Open the `docs/` folder.
+3. In the top right, click **Add file** ➔ **Upload files**.
+4. Drag and drop your exported `crkn_all_manual_adjudications.json`.
+5. Enter a commit message (e.g., `docs: update manual adjudications for Newspapers batch`) and click **Commit changes**.
+
+#### Via Git Command Line:
+```bash
+# Copy the exported file into your local docs folder:
+cp ~/Downloads/crkn_all_manual_adjudications.json docs/
+
+# Commit and push:
+git add docs/crkn_all_manual_adjudications.json
+git commit -m "docs: update central manual adjudications bundle"
+git push origin main
+```
+
+---
+
+### How Other Team Members Import the Central File
+
+To load the team's latest saved decisions into another browser:
+1. Download the latest `docs/crkn_all_manual_adjudications.json` from the repository.
+2. Go to the [Master AI Dashboard](https://crkn-rcdr.github.io/OCR-Evaluations/).
+3. Click the green **"Import Reviews"** button in the top navigation bar.
+4. Select `crkn_all_manual_adjudications.json`.
+5. The dashboard table and all 6,500+ comparison pages will instantly populate with the reviewed verdicts, winner chips, and dynamic `✍️ N manual` badges.
+
+---
+
 ## Where To Look Next
 
 For run-specific analysis:
 
-- use [1-stress-test/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\1-stress-test\README.md) for the original single-page stress test
-- use [2-multi-document-abbyy-vs-tiled3x2+docparse-paddleocr-paddlevl/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\2-multi-document-abbyy-vs-tiled3x2+docparse-paddleocr-paddlevl\README.md) for ABBYY vs `3x2`
-- use [3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl\README.md) for ABBYY vs `3x1`
-- use [4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl/README.md](c:\Users\BrittnyLapierre\Documents\OCR-Evaluations\4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl\README.md) for ABBYY vs no tiling and the canonical cross-run recommendation
+- use [1-stress-test/README.md](1-stress-test/README.md) for the original single-page stress test
+- use [2-multi-document-abbyy-vs-tiled3x2+docparse-paddleocr-paddlevl/README.md](2-multi-document-abbyy-vs-tiled3x2+docparse-paddleocr-paddlevl/README.md) for ABBYY vs `3x2`
+- use [3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/README.md](3-multi-document-abbyy-vs-tiled3x1+docparse-paddleocr-paddlevl/README.md) for ABBYY vs `3x1`
+- use [4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl/README.md](4-multi-document-abbyy-vs-notiles-paddleocr-paddlevl/README.md) for ABBYY vs no tiling and the canonical cross-run recommendation
+
