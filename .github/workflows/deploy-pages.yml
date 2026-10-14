@@ -28,6 +28,29 @@ jobs:
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
+      - name: Batch Optimize Web Scans
+        run: |
+          pip install Pillow
+          python3 -c "
+          import glob
+          from PIL import Image
+          from concurrent.futures import ThreadPoolExecutor
+
+          def opt(p):
+              try:
+                  with Image.open(p) as im:
+                      im.thumbnail((1400, 1400), Image.Resampling.LANCZOS)
+                      im.save(p, 'JPEG', quality=70, optimize=True)
+              except Exception:
+                  pass
+
+          files = glob.glob('docs/**/*.jpg', recursive=True)
+          print(f'Optimizing {len(files)} scan images for web deployment...')
+          with ThreadPoolExecutor(max_workers=8) as pool:
+              list(pool.map(opt, files))
+          print('Web optimization complete.')
+          "
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -37,4 +60,4 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         with:
-          timeout: 2400000 # 40 minutes timeout for large 4.2GB dataset
+          timeout: 2400000
